@@ -1,0 +1,107 @@
+/* source_handbook: week11-hackathon-preparation */
+@import "tailwindcss";
+
+/* ===== Design Tokens ===== */
+:root {
+  --color-bg-primary: #0a0f1e;
+  --color-bg-secondary: #111827;
+  --color-accent: #d4a84b;
+  --color-accent-hover: #e6bc5f;
+  --color-text-primary: #ffffff;
+  --color-text-muted: #9ca3af;
+  --color-text-subtle: #6b7280;
+  --color-border: rgba(212, 168, 75, 0.15);
+  --color-border-hover: rgba(212, 168, 75, 0.35);
+  --color-glass: rgba(17, 24, 39, 0.6);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --font-heading: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+/* ===== Base Styles ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 168, 75, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 168, 75, 0.5);
+}
+
+/* ===== Glass Card Utility ===== */
+.glass-card {
+  background: var(--color-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 1rem;
+}
+
+/* ===== Shimmer Animation ===== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ===== Ken Burns Effect ===== */
+@keyframes kenburns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+.ken-burns {
+  animation: kenburns 12s ease-out forwards;
+}
+
+/* ===== Gold Text Gradient ===== */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #d4a84b 0%, #f0d78c 50%, #d4a84b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
