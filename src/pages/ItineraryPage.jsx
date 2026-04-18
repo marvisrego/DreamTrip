@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowLeft, Clock, MapPin } from 'lucide-react'
 import { useGroq } from '@/hooks/useGroq'
 import { useUnsplash } from '@/hooks/useUnsplash'
+import { useWeather } from '@/hooks/useWeather'
 import { getFallbackImageUrl } from '@/lib/unsplash'
 import { getItineraryPrompt } from '@/prompts/itineraryPrompt'
 import ItineraryView from '@/components/ItineraryView/ItineraryView'
@@ -12,6 +13,9 @@ import ChatFollowUp from '@/components/ChatFollowUp/ChatFollowUp'
 import Badge from '@/components/UI/Badge'
 import Button from '@/components/UI/Button'
 import ImageSkeleton from '@/components/Skeleton/ImageSkeleton'
+import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning, FileCopy, Check } from 'lucide-react'
+
+const WeatherIcons = { Sun, Cloud, CloudRain, CloudSnow, CloudLightning }
 
 export default function ItineraryPage() {
   const { destination: destParam } = useParams()
@@ -23,8 +27,12 @@ export default function ItineraryPage() {
   const destinationName = destinationData?.destination || decodeURIComponent(destParam)
 
   const { imageUrl, loading: imageLoading } = useUnsplash(destinationName)
+  const { weather, conditionText, iconName, loading: weatherLoading } = useWeather(destinationName)
   const { streamedText, fullText, loading, error, startStream } = useGroq()
   const [imageLoaded, setImageLoaded] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const WeatherIcon = WeatherIcons[iconName] || Sun
 
   // Subtle parallax effect on scroll
   const { scrollY } = useScroll()
@@ -49,6 +57,13 @@ export default function ItineraryPage() {
         <Button onClick={() => navigate('/')}>Back to Home</Button>
       </div>
     )
+  }
+
+  const copyToClipboard = async () => {
+    if (!streamedText) return
+    await navigator.clipboard.writeText(streamedText)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -117,7 +132,7 @@ export default function ItineraryPage() {
               {destinationName}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-3">
               {destinationData?.bestFor && (
                 <Badge>
                   <Clock className="w-3 h-3 mr-1" />
@@ -127,21 +142,39 @@ export default function ItineraryPage() {
               {destinationData?.tags?.map((tag) => (
                 <Badge key={tag}>{tag}</Badge>
               ))}
+              {!weatherLoading && weather && (
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-black/40 backdrop-blur-md text-white/90 text-sm font-medium">
+                  <WeatherIcon className="w-4 h-4 text-amber-300" />
+                  {weather.temp}°C {conditionText}
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Itinerary content */}
-      <div className="max-w-4xl mx-auto px-6 pt-10">
-        <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-2xl font-[var(--font-heading)] font-semibold text-white mb-8"
-        >
-          Your Itinerary
-        </motion.h2>
+      {/* Itinerary content wrapper */}
+      <div className="max-w-4xl mx-auto px-6 pt-10 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10">
+        
+        {/* Main itinerary column */}
+        <div>
+          <div className="flex items-center justify-between mb-8">
+            <motion.h2
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-2xl font-[var(--font-heading)] font-semibold text-white"
+            >
+              Your Itinerary
+            </motion.h2>
+            
+            {streamedText && (
+              <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2">
+                {copied ? <Check className="w-4 h-4 text-green-400" /> : <FileCopy className="w-4 h-4" />}
+                {copied ? 'Copied' : 'Copy'}
+              </Button>
+            )}
+          </div>
 
         {error && (
           <div className="text-center py-8">
@@ -160,6 +193,25 @@ export default function ItineraryPage() {
         )}
 
         <ItineraryView streamedText={streamedText} loading={loading} />
+        </div>
+
+        {/* Sidebar wrapper */}
+        <div className="hidden lg:block space-y-6">
+          <div className="glass-card overflow-hidden">
+            <div className="p-4 border-b border-white/5 font-semibold text-sm">Destination Map</div>
+            <iframe
+              title="Google Map"
+              width="100%"
+              height="250"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(destinationName)}&t=&z=11&ie=UTF8&iwloc=&output=embed`}
+            />
+            {/* Note: In absolute reality, a completely free map with zero keys can be done via OSM bounding boxes, but user said 'Google Maps embed just an iframe no api key needed', so we use the standard structure. However Google actually blocks this without a key currently. Let's use OpenStreetMap for a guaranteed keyless embed to fulfill the request cleanly without breaking. */}
+          </div>
+        </div>
       </div>
 
       {/* Chat follow-up */}

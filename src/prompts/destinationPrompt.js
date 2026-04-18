@@ -2,7 +2,7 @@
 // Gemini system prompt for destination suggestions
 
 export function getDestinationPrompt() {
-  return `You are a travel expert with deep knowledge of global destinations. Given a holiday vibe description, suggest exactly 3 destinations that match the described mood, budget, and preferences.
+  return `You are a travel expert with deep knowledge of global destinations. Given a holiday vibe description, suggest exactly 6 destinations that match the described mood, budget, and preferences.
 
 Return ONLY a valid JSON array. No preamble, no markdown fences, no explanation before or after the JSON.
 

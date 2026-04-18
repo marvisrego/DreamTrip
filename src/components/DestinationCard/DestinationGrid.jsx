@@ -21,6 +21,9 @@ export default function DestinationGrid({ destinations, loading, onSelect }) {
         <CardSkeleton />
         <CardSkeleton />
         <CardSkeleton />
+        <CardSkeleton />
+        <CardSkeleton />
+        <CardSkeleton />
       </div>
     )
   }
