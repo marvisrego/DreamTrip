@@ -39,7 +39,7 @@ export default function DayCard({ dayText, dayNumber, index = 0 }) {
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 24, delay: index * 0.1 }}
       className="relative pl-8 md:pl-12 pb-10"
     >
       {/* Timeline dot */}

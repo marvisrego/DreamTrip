@@ -36,8 +36,10 @@ export default function VibeInput({ onSubmit, loading = false }) {
               onChange={(e) => setVibe(e.target.value.slice(0, maxChars))}
               placeholder="e.g. solo trip, beaches, not touristy, under £1000"
               disabled={loading}
+              aria-label="Trip vibe description"
+              autoComplete="off"
               className="
-                flex-1 bg-transparent border-none outline-none
+                flex-1 bg-transparent border-none outline-none focus-visible:ring-0
                 text-lg text-white placeholder:text-[var(--color-text-subtle)]
                 font-[var(--font-body)] py-4 px-2
                 disabled:opacity-50

@@ -1,11 +1,12 @@
 // source_handbook: week11-hackathon-preparation
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Plane } from 'lucide-react'
 import VibeInput from '@/components/VibeInput/VibeInput'
 
 export default function LandingPage() {
   const navigate = useNavigate()
+  const shouldReduceMotion = useReducedMotion()
 
   const handleSubmit = (vibe) => {
     navigate('/results', { state: { vibe } })
@@ -16,7 +17,7 @@ export default function LandingPage() {
       {/* Background image with Ken Burns */}
       <div className="absolute inset-0 z-0">
         <div
-          className="absolute inset-0 ken-burns bg-cover bg-center"
+          className={`absolute inset-0 bg-cover bg-center ${shouldReduceMotion ? '' : 'ken-burns'}`}
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80')`,
           }}
@@ -34,8 +35,8 @@ export default function LandingPage() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="flex items-center justify-center gap-3 mb-6"
         >
-          <Plane className="w-8 h-8 text-[var(--color-accent)]" />
-          <h1 className="text-5xl md:text-6xl font-[var(--font-heading)] font-bold text-gold-gradient">
+          <Plane className="w-10 h-10 md:w-12 md:h-12 text-[var(--color-accent)]" />
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-[var(--font-heading)] font-bold text-gold-gradient tracking-tight">
             DreamTrip
           </h1>
         </motion.div>

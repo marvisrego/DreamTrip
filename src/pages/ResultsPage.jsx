@@ -45,10 +45,11 @@ export default function ResultsPage() {
       <div className="max-w-6xl mx-auto px-6 pt-8">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-[var(--color-text-muted)] hover:text-white transition-colors mb-8 cursor-pointer"
+          aria-label="Start over"
+          className="flex items-center gap-2 py-2 text-[var(--color-text-muted)] hover:text-white transition-colors mb-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm">Start over</span>
+          <span className="text-sm font-medium">Start over</span>
         </button>
 
         <motion.div

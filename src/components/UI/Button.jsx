@@ -29,10 +29,12 @@ export default function Button({
       disabled={disabled}
       whileHover={{ scale: disabled ? 1 : 1.02 }}
       whileTap={{ scale: disabled ? 1 : 0.98 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       className={`
-        inline-flex items-center justify-center gap-2
+        inline-flex items-center justify-center gap-2 min-h-[44px]
         font-[var(--font-body)] tracking-wide
         transition-colors duration-200
+        focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-primary)] outline-none
         disabled:opacity-40 disabled:cursor-not-allowed
         cursor-pointer
         ${variants[variant]}

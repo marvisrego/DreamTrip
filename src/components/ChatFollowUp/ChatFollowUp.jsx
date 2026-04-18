@@ -100,7 +100,8 @@ export default function ChatFollowUp({ destination, vibe, itinerary }) {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-full hover:bg-white/5 transition-colors cursor-pointer"
+                aria-label="Close chat"
+                className="p-2 min-w-[44px] min-h-[44px] flex flex-col items-center justify-center rounded-full hover:bg-white/5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] outline-none"
               >
                 <X className="w-4 h-4 text-[var(--color-text-muted)]" />
               </button>
@@ -161,16 +162,20 @@ export default function ChatFollowUp({ destination, vibe, itinerary }) {
                   onKeyDown={handleKeyDown}
                   placeholder="e.g. make it more adventurous / add a beach day"
                   disabled={loading}
-                  className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder:text-[var(--color-text-subtle)] disabled:opacity-50"
+                  aria-label="Chat input"
+                  autoComplete="off"
+                  className="flex-1 bg-transparent border-none outline-none focus-visible:ring-0 text-sm text-white placeholder:text-[var(--color-text-subtle)] disabled:opacity-50"
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || loading}
+                  aria-label="Send message"
                   className="
-                    shrink-0 w-8 h-8 rounded-full
+                    shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full
                     bg-[var(--color-accent)] text-[var(--color-bg-primary)]
                     flex items-center justify-center
                     disabled:opacity-30 transition-opacity cursor-pointer
+                    focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-primary)] outline-none
                   "
                 >
                   <ArrowUp className="w-4 h-4" />

@@ -8,16 +8,25 @@ import Badge from '@/components/UI/Badge'
 import Button from '@/components/UI/Button'
 import ImageSkeleton from '@/components/Skeleton/ImageSkeleton'
 
+const itemVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 24 }
+  },
+}
+
 export default function DestinationCard({ destination, index = 0, onSelect }) {
   const { imageUrl, credit, loading: imageLoading } = useUnsplash(destination.destination)
   const [imageLoaded, setImageLoaded] = useState(false)
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.15, ease: 'easeOut' }}
-      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+      variants={itemVariants}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       className="glass-card overflow-hidden cursor-pointer group"
       onClick={() => onSelect(destination)}
     >
