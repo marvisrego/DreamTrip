@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
-import { Plane, ChevronDown } from 'lucide-react'
-import { PromptInputBox } from '@/components/AIPromptBox/PromptInputBox'
+import { motion, useReducedMotion } from 'framer-motion'
+import { Plane, ChevronDown, ArrowUp } from 'lucide-react'
 
 /* ── Stagger variants ───────────────────────────────────────── */
 const container = {
@@ -21,6 +20,8 @@ export default function LandingPage() {
   const shouldReduceMotion = useReducedMotion()
 
   const [activeVideo, setActiveVideo] = useState(1)
+  const [input, setInput] = useState('')
+  const textareaRef = useRef(null)
   const videoRefs = [useRef(null), useRef(null), useRef(null), useRef(null)]
 
   useEffect(() => {
@@ -33,9 +34,26 @@ export default function LandingPage() {
 
   const handleVideoEnded = () => setActiveVideo((prev) => (prev % 4) + 1)
 
-  const handleSend = (message) => {
-    if (message.trim()) navigate('/results', { state: { vibe: message } })
+  const handleSend = () => {
+    if (input.trim()) navigate('/results', { state: { vibe: input.trim() } })
   }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px'
+  }, [input])
+
+  const hasContent = input.trim().length > 0
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -101,23 +119,55 @@ export default function LandingPage() {
             Describe your dream &nbsp;·&nbsp; We'll plan the trip
           </motion.p>
 
-          {/* ── Input box ── */}
+          {/* ── Clean ChatGPT-style Input ── */}
           <motion.div
             variants={fadeUp}
             className="w-full max-w-2xl"
           >
-            <PromptInputBox
-              onSend={handleSend}
-              placeholder="e.g. solo beaches, under £1000, warm weather"
-              maxChars={200}
-              className="rounded-[2rem] !bg-white/[0.06] !border-white/[0.08] backdrop-blur-2xl"
-            />
+            <div className="relative flex items-end rounded-3xl bg-white/[0.07] border border-white/[0.1] backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.3)] transition-all duration-200 focus-within:border-white/[0.2] focus-within:bg-white/[0.09]">
+              {/* Textarea */}
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value.slice(0, 200))}
+                onKeyDown={handleKeyDown}
+                rows={1}
+                placeholder="Describe your dream trip..."
+                className="flex-1 bg-transparent border-none outline-none resize-none text-base text-white placeholder:text-white/35 px-6 py-4 min-h-[56px] max-h-[120px] leading-relaxed font-[var(--font-body)]"
+                style={{ scrollbarWidth: 'none' }}
+              />
+
+              {/* Send button — ChatGPT style */}
+              <div className="p-2.5">
+                <button
+                  onClick={handleSend}
+                  disabled={!hasContent}
+                  aria-label="Send"
+                  className={`
+                    flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 cursor-pointer outline-none
+                    ${hasContent
+                      ? 'bg-white text-[#0a0f1e] shadow-lg hover:bg-white/90 hover:shadow-xl hover:scale-105 active:scale-95'
+                      : 'bg-white/10 text-white/25 cursor-default'
+                    }
+                  `}
+                >
+                  <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+
+            {/* Character counter */}
+            <div className="flex justify-end mt-2 px-2">
+              <span className={`text-xs font-[var(--font-body)] transition-colors ${input.length > 180 ? 'text-red-400' : 'text-white/20'}`}>
+                {input.length}/200
+              </span>
+            </div>
           </motion.div>
 
           {/* ── Provider hint ── */}
           <motion.p
             variants={fadeUp}
-            className="mt-6 text-[11px] tracking-[0.18em] uppercase text-white/25 font-[var(--font-body)]"
+            className="mt-5 text-[11px] tracking-[0.18em] uppercase text-white/25 font-[var(--font-body)]"
           >
             Powered by GitHub Models &middot; GPT-4o mini
           </motion.p>
