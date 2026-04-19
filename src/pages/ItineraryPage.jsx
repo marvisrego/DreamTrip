@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowLeft, Clock, MapPin } from 'lucide-react'
-import { useGroq } from '@/hooks/useGroq'
+import { streamItinerary } from '@/lib/api'
 import { useUnsplash } from '@/hooks/useUnsplash'
 import { useWeather } from '@/hooks/useWeather'
 import { getFallbackImageUrl } from '@/lib/unsplash'
@@ -13,7 +13,7 @@ import ChatFollowUp from '@/components/ChatFollowUp/ChatFollowUp'
 import Badge from '@/components/UI/Badge'
 import Button from '@/components/UI/Button'
 import ImageSkeleton from '@/components/Skeleton/ImageSkeleton'
-import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning, FileCopy, Check } from 'lucide-react'
+import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Copy, Check } from 'lucide-react'
 
 const WeatherIcons = { Sun, Cloud, CloudRain, CloudSnow, CloudLightning }
 
@@ -28,7 +28,10 @@ export default function ItineraryPage() {
 
   const { imageUrl, loading: imageLoading } = useUnsplash(destinationName)
   const { weather, conditionText, iconName, loading: weatherLoading } = useWeather(destinationName)
-  const { streamedText, fullText, loading, error, startStream } = useGroq()
+  const [streamedText, setStreamedText] = useState('')
+  const [fullText, setFullText] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -38,16 +41,30 @@ export default function ItineraryPage() {
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 500], [0, 150])
 
+  const generateItinerary = async () => {
+    if (!destinationName || !vibe) return
+    
+    setLoading(true)
+    setError(null)
+    setStreamedText('')
+    
+    try {
+      let accumulated = ''
+      await streamItinerary(destinationName, vibe, (chunk) => {
+        accumulated += chunk
+        setStreamedText(accumulated)
+      })
+      setFullText(accumulated)
+    } catch (err) {
+      setError('Failed to generate itinerary. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Request itinerary on mount
   useEffect(() => {
-    if (destinationName && vibe) {
-      const systemPrompt = getItineraryPrompt(
-        destinationName,
-        vibe,
-        destinationData?.bestFor || '7 days'
-      )
-      startStream(systemPrompt, `Create my itinerary for ${destinationName}`)
-    }
+    generateItinerary()
   }, []) // Only on mount
 
   if (!destinationName) {
@@ -170,7 +187,7 @@ export default function ItineraryPage() {
             
             {streamedText && (
               <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2">
-                {copied ? <Check className="w-4 h-4 text-green-400" /> : <FileCopy className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                 {copied ? 'Copied' : 'Copy'}
               </Button>
             )}
@@ -179,14 +196,7 @@ export default function ItineraryPage() {
         {error && (
           <div className="text-center py-8">
             <p className="text-red-400 mb-4">{error}</p>
-            <Button onClick={() => {
-              const systemPrompt = getItineraryPrompt(
-                destinationName,
-                vibe || '',
-                destinationData?.bestFor || '7 days'
-              )
-              startStream(systemPrompt, `Create my itinerary for ${destinationName}`)
-            }}>
+            <Button onClick={generateItinerary}>
               Try Again
             </Button>
           </div>

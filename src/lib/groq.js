@@ -1,12 +1,32 @@
 // source_handbook: week11-hackathon-preparation
-// Groq API wrapper — itinerary generation and chat
-// Uses llama-3.3-70b-versatile with real SSE streaming via ReadableStream
-// Accepts onChunk callback for progressive UI rendering
+// GitHub Models API wrapper — itinerary generation and chat
+// Uses gpt-4o-mini via OpenAI SDK
+// Base URL: https://models.inference.ai.azure.com
 
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+import OpenAI from 'openai'
+
+const GITHUB_MODELS_URL = 'https://models.inference.ai.azure.com'
+const DEFAULT_MODEL = 'gpt-4o-mini'
 
 /**
- * Call Groq API with streaming support.
+ * Initialize OpenAI client for GitHub Models
+ */
+const getClient = () => {
+  const apiKey = import.meta.env.VITE_GITHUB_TOKEN
+  if (!apiKey) {
+    throw new Error('VITE_GITHUB_TOKEN is not set in environment variables')
+  }
+
+  return new OpenAI({
+    baseURL: GITHUB_MODELS_URL,
+    apiKey: apiKey,
+    dangerouslyAllowBrowser: true // Required for Vite/frontend
+  })
+}
+
+
+/**
+ * Call GitHub Models API with streaming support.
  * @param {Array<{role: string, content: string}>} messages - Conversation messages
  * @param {string} systemPrompt - System prompt for the model
  * @param {function} onChunk - Callback called with each text chunk as it arrives
@@ -14,72 +34,26 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
  * @returns {Promise<string>} Full completed response text
  */
 export async function callGroqStream(messages, systemPrompt, onChunk, signal) {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY
-  if (!apiKey) {
-    throw new Error('VITE_GROQ_API_KEY is not set in environment variables')
-  }
-
+  const client = getClient()
   const fullMessages = [
     { role: 'system', content: systemPrompt },
     ...messages
   ]
 
-  const response = await fetch(GROQ_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: fullMessages,
-      stream: true,
-      temperature: 0.7,
-      max_tokens: 4096,
-    }),
-    signal,
-  })
+  const stream = await client.chat.completions.create({
+    model: DEFAULT_MODEL,
+    messages: fullMessages,
+    stream: true,
+    temperature: 0.7,
+    max_tokens: 4096,
+  }, { signal })
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(
-      `Groq API error (${response.status}): ${errorData?.error?.message || response.statusText}`
-    )
-  }
-
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder()
   let fullText = ''
-  let buffer = ''
-
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-
-    buffer += decoder.decode(value, { stream: true })
-
-    // Process SSE lines from the buffer
-    const lines = buffer.split('\n')
-    // Keep the last potentially incomplete line in the buffer
-    buffer = lines.pop() || ''
-
-    for (const line of lines) {
-      const trimmed = line.trim()
-      if (!trimmed || !trimmed.startsWith('data: ')) continue
-      
-      const data = trimmed.slice(6) // Remove 'data: ' prefix
-      if (data === '[DONE]') continue
-
-      try {
-        const parsed = JSON.parse(data)
-        const content = parsed.choices?.[0]?.delta?.content
-        if (content) {
-          fullText += content
-          onChunk(content, fullText)
-        }
-      } catch {
-        // Skip malformed SSE chunks silently
-      }
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content || ''
+    if (content) {
+      fullText += content
+      onChunk(content, fullText)
     }
   }
 
@@ -87,41 +61,28 @@ export async function callGroqStream(messages, systemPrompt, onChunk, signal) {
 }
 
 /**
- * Call Groq API without streaming (single response).
+ * Call GitHub Models API without streaming (single response).
  * @param {Array<{role: string, content: string}>} messages - Conversation messages
  * @param {string} systemPrompt - System prompt
  * @returns {Promise<string>} Complete response text
  */
 export async function callGroq(messages, systemPrompt) {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY
-  if (!apiKey) {
-    throw new Error('VITE_GROQ_API_KEY is not set in environment variables')
-  }
+  const client = getClient()
+  
+  const requestPayload = {
+    model: DEFAULT_MODEL,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...messages
+    ],
+    temperature: 0.7,
+    max_tokens: 4096,
+  };
+  
+  console.log('Sending this request to GitHub Models API:', requestPayload);
 
-  const response = await fetch(GROQ_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages
-      ],
-      temperature: 0.7,
-      max_tokens: 4096,
-    }),
-  })
+  const response = await client.chat.completions.create(requestPayload)
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(
-      `Groq API error (${response.status}): ${errorData?.error?.message || response.statusText}`
-    )
-  }
-
-  const data = await response.json()
-  return data.choices?.[0]?.message?.content || ''
+  return response.choices[0]?.message?.content || ''
 }
+

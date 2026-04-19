@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xxd /c/Users/marvi/OneDrive/Documents/MDX/LLM/HACKATHON/prompy)",
+      "Bash(npx skills:*)",
+      "Bash(npm run:*)",
+      "WebSearch"
+    ]
+  }
+}

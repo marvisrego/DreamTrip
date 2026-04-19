@@ -1,25 +1,51 @@
 /* source_handbook: week11-hackathon-preparation */
+
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400;1,500;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
 @import "tailwindcss";
 
-/* ===== Design Tokens ===== */
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════════ */
 :root {
-  --color-bg-primary: #0a0f1e;
-  --color-bg-secondary: #111827;
-  --color-accent: #d4a84b;
-  --color-accent-hover: #e6bc5f;
-  --color-text-primary: #ffffff;
-  --color-text-muted: #9ca3af;
-  --color-text-subtle: #6b7280;
-  --color-border: rgba(212, 168, 75, 0.15);
-  --color-border-hover: rgba(212, 168, 75, 0.35);
-  --color-glass: rgba(17, 24, 39, 0.6);
-  --color-glass-border: rgba(255, 255, 255, 0.08);
-  --font-heading: 'Cormorant Garamond', serif;
-  --font-body: 'DM Sans', sans-serif;
+  /* Palette */
+  --color-bg-primary:    #0a0f1e;
+  --color-bg-secondary:  #111827;
+  --color-bg-card:       rgba(15, 20, 35, 0.75);
+  --color-accent:        #d4a84b;
+  --color-accent-hover:  #e6bc5f;
+  --color-accent-dim:    rgba(212, 168, 75, 0.12);
+  --color-text-primary:  #ffffff;
+  --color-text-muted:    #9ca3af;
+  --color-text-subtle:   #6b7280;
+  --color-border:        rgba(212, 168, 75, 0.15);
+  --color-border-hover:  rgba(212, 168, 75, 0.45);
+  --color-glass:         rgba(10, 15, 30, 0.72);
+  --color-glass-border:  rgba(255, 255, 255, 0.07);
+
+  /* Typography */
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  /* Spacing */
+  --section-pad: 80px;
+  --content-max:  1200px;
+
+  /* Radius */
+  --radius-card: 1.25rem;
+  --radius-btn:  9999px;
+
+  /* Shadows */
+  --shadow-card:   0 4px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.04) inset;
+  --shadow-card-hover: 0 8px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(212,168,75,0.25);
+  --shadow-gold:   0 0 32px rgba(212,168,75,0.18);
 }
 
-/* ===== Base Styles ===== */
-* {
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════ */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -27,6 +53,7 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -36,72 +63,207 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  line-height: 1.6;
 }
 
+/* All headings use Playfair Display */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-/* ===== Scrollbar ===== */
-::-webkit-scrollbar {
-  width: 6px;
-}
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-body); cursor: pointer; }
+img, video { max-width: 100%; display: block; }
+input, textarea, select { font-family: var(--font-body); }
 
-::-webkit-scrollbar-track {
-  background: var(--color-bg-primary);
-}
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════ */
+::-webkit-scrollbar               { width: 5px; }
+::-webkit-scrollbar-track         { background: var(--color-bg-primary); }
+::-webkit-scrollbar-thumb         { background: rgba(212,168,75,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover   { background: rgba(212,168,75,0.45); }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(212, 168, 75, 0.3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 168, 75, 0.5);
-}
-
-/* ===== Glass Card Utility ===== */
+/* ═══════════════════════════════════════════════
+   GLASS CARD
+   ═══════════════════════════════════════════════ */
 .glass-card {
-  background: var(--color-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--color-glass-border);
-  border-radius: 1rem;
+  background:           var(--color-glass);
+  backdrop-filter:      blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border:               1px solid var(--color-glass-border);
+  border-radius:        var(--radius-card);
+  box-shadow:           var(--shadow-card);
+  transition:           box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+.glass-card:hover {
+  border-color:  rgba(212, 168, 75, 0.22);
+  box-shadow:    var(--shadow-card-hover);
 }
 
-/* ===== Shimmer Animation ===== */
+/* ═══════════════════════════════════════════════
+   TYPOGRAPHY UTILITIES
+   ═══════════════════════════════════════════════ */
+.text-gold-gradient {
+  background:            linear-gradient(135deg, #c9962a 0%, #f0d78c 45%, #d4a84b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip:       text;
+}
+
+.text-glow-gold {
+  text-shadow:
+    0 0 40px rgba(212, 168, 75, 0.50),
+    0 0 80px rgba(212, 168, 75, 0.20);
+}
+
+.font-heading { font-family: var(--font-heading); }
+.font-body    { font-family: var(--font-body); }
+
+/* ═══════════════════════════════════════════════
+   SHIMMER SKELETON
+   (from #111827 to #1f2937 — spec)
+   ═══════════════════════════════════════════════ */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
 }
-
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03) 25%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.03) 75%
+    #111827 0%,
+    #1a2234 40%,
+    #1f2937 50%,
+    #1a2234 60%,
+    #111827 100%
   );
-  background-size: 200% 100%;
+  background-size: 800px 100%;
   animation: shimmer 1.8s ease-in-out infinite;
 }
 
-/* ===== Ken Burns Effect ===== */
+/* ═══════════════════════════════════════════════
+   KEN BURNS
+   ═══════════════════════════════════════════════ */
 @keyframes kenburns {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.1); }
+  0%   { transform: scale(1) translateX(0); }
+  100% { transform: scale(1.08) translateX(-2%); }
 }
-
 .ken-burns {
-  animation: kenburns 12s ease-out forwards;
+  animation: kenburns 14s ease-out forwards;
 }
 
-/* ===== Gold Text Gradient ===== */
-.text-gold-gradient {
-  background: linear-gradient(135deg, #d4a84b 0%, #f0d78c 50%, #d4a84b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ═══════════════════════════════════════════════
+   FLOATING / FLOAT BOB
+   ═══════════════════════════════════════════════ */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════
+   GLOW PULSE
+   ═══════════════════════════════════════════════ */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0   0   rgba(212,168,75,0); }
+  50%       { box-shadow: 0 0 24px 6px rgba(212,168,75,0.22); }
+}
+.animate-glow-pulse { animation: glow-pulse 2.8s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════
+   ORB DRIFT (background decoration)
+   ═══════════════════════════════════════════════ */
+@keyframes drift {
+  0%   { transform: translate(0,0)      scale(1);    }
+  33%  { transform: translate(45px,-65px) scale(1.07); }
+  66%  { transform: translate(-35px,42px) scale(0.95); }
+  100% { transform: translate(0,0)      scale(1);    }
+}
+@keyframes drift2 {
+  0%   { transform: translate(0,0)       scale(1);    }
+  33%  { transform: translate(-55px,32px) scale(1.05); }
+  66%  { transform: translate(38px,-52px) scale(0.97); }
+  100% { transform: translate(0,0)       scale(1);    }
+}
+.animate-drift  { animation: drift  20s ease-in-out infinite; }
+.animate-drift2 { animation: drift2 25s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════
+   CARD SHINE SWEEP
+   ═══════════════════════════════════════════════ */
+@keyframes shine {
+  0%   { left: -120%; }
+  55%  { left:  140%; }
+  100% { left:  140%; }
+}
+.card-shine { position: relative; overflow: hidden; }
+.card-shine::after {
+  content:    '';
+  position:   absolute;
+  top: 0; left: -120%;
+  width: 55%; height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255,255,255,0.055) 50%,
+    transparent 80%
+  );
+  animation: shine 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLL INDICATOR (bounce arrow)
+   ═══════════════════════════════════════════════ */
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0) scaleY(1);    opacity: 0.8; }
+  50%       { transform: translateY(8px) scaleY(0.9); opacity: 0.4; }
+}
+.animate-scroll-bounce { animation: scroll-bounce 1.8s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════
+   TIMELINE
+   ═══════════════════════════════════════════════ */
+.timeline-line {
+  background: linear-gradient(
+    to bottom,
+    rgba(212,168,75,0.6) 0%,
+    rgba(212,168,75,0.25) 60%,
+    transparent 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   TEXTAREA SCROLLBAR (prompt box)
+   ═══════════════════════════════════════════════ */
+.prompt-textarea::-webkit-scrollbar       { width: 5px; }
+.prompt-textarea::-webkit-scrollbar-track { background: transparent; }
+.prompt-textarea::-webkit-scrollbar-thumb {
+  background-color: rgba(212,168,75,0.28);
+  border-radius:    3px;
+}
+.prompt-textarea::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(212,168,75,0.5);
+}
+
+/* ═══════════════════════════════════════════════
+   FROSTED BADGE
+   ═══════════════════════════════════════════════ */
+.badge-frosted {
+  background:    rgba(255, 255, 255, 0.07);
+  border:        1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+/* ═══════════════════════════════════════════════
+   STICKY NAV BLUR
+   ═══════════════════════════════════════════════ */
+.nav-blur {
+  background:    rgba(10, 15, 30, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }

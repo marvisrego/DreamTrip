@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { MessageSquare, X, Sparkles } from 'lucide-react'
-import { useGroq } from '@/hooks/useGroq'
-import { getChatPrompt } from '@/prompts/chatPrompt'
+import { streamChat } from '@/lib/api'
 import ChatMessage from './ChatMessage'
 import { AIPromptBox } from '@/components/AIPromptBox/AIPromptBox'
 
@@ -10,13 +9,10 @@ export default function ChatFollowUp({ destination, vibe, itinerary }) {
   const [isOpen, setIsOpen] = useState(false)
   const scrollRef = useRef(null)
 
-  const {
-    streamedText,
-    loading,
-    error,
-    startStream,
-    messages,
-  } = useGroq()
+  const [messages, setMessages] = useState([])
+  const [streamedText, setStreamedText] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -25,10 +21,29 @@ export default function ChatFollowUp({ destination, vibe, itinerary }) {
     }
   }, [messages, streamedText])
 
-  const handleSend = (text) => {
+  const handleSend = async (text) => {
     if (!text || loading) return
-    const systemPrompt = getChatPrompt(destination, vibe, itinerary)
-    startStream(systemPrompt, text)
+    
+    const newMessages = [...messages, { role: 'user', content: text }]
+    setMessages(newMessages)
+    setLoading(true)
+    setError(null)
+    setStreamedText('')
+    
+    let accumulated = ''
+    try {
+      await streamChat(text, messages, destination, vibe, itinerary, (chunk) => {
+        accumulated += chunk
+        setStreamedText(accumulated)
+      })
+      
+      setMessages([...newMessages, { role: 'assistant', content: accumulated }])
+      setStreamedText('')
+    } catch (err) {
+      setError('Failed to send message.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Filter out system messages for display
