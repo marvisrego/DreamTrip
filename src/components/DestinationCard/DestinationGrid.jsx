@@ -13,27 +13,28 @@ const containerVariants = {
 
 // Bento layout:
 //   Row 1 (lg:grid-cols-3): [Featured col-span-2] [Regular]
-//   Row 2:                   [Regular] [Regular] [Regular]
-//   Row 3:                   [Regular] [Regular] [Regular]
-//   Row 4 (full-width):      [Banner col-span-3]
-// Total = 1 featured + 7 regular + 1 banner = 9 cards
+//   Row 2+:                  [Regular] [Regular] [Regular]
+//   Last row (full-width):   [Banner col-span-3]
+// Total = 1 featured + N regular + 1 banner
 
 export default function DestinationGrid({ destinations, loading, onSelect }) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 w-full max-w-[1800px] mx-auto">
         {/* Simulate the bento skeleton */}
-        <div className="lg:col-span-2 min-h-[420px]">
+        <div className="min-h-[460px]">
           <CardSkeleton tall />
         </div>
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-        <div className="lg:col-span-3">
+        <div>
+          <CardSkeleton />
+        </div>
+        <div>
+          <CardSkeleton />
+        </div>
+        <div>
+          <CardSkeleton />
+        </div>
+        <div className="col-span-full">
           <CardSkeleton wide />
         </div>
       </div>
@@ -44,18 +45,37 @@ export default function DestinationGrid({ destinations, loading, onSelect }) {
 
   const featured  = destinations[0]                                      // index 0 → featured
   const regular   = destinations.slice(1, destinations.length - 1)       // indices 1..n-2
-  const banner    = destinations[destinations.length - 1]                 // last index → banner
+  const banner    = destinations.length > 2 ? destinations[destinations.length - 1] : null  // last index → banner (only if 3+)
+
+  // If only 2 destinations, show featured + one regular
+  if (destinations.length === 2) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 w-full max-w-[1800px] mx-auto"
+      >
+        <div key={featured.destination}>
+          <DestinationCard destination={featured} index={0} variant="featured" onSelect={onSelect} />
+        </div>
+        <div>
+          <DestinationCard key={destinations[1].destination} destination={destinations[1]} index={1} variant="regular" onSelect={onSelect} />
+        </div>
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 w-full max-w-[1800px] mx-auto"
     >
       <AnimatePresence>
-        {/* ── Featured card (2 columns) ── */}
-        <div key={featured.destination} className="lg:col-span-2">
+        {/* ── Featured card (2fr) ── */}
+        <div key={featured.destination}>
           <DestinationCard
             destination={featured}
             index={0}
@@ -64,20 +84,21 @@ export default function DestinationGrid({ destinations, loading, onSelect }) {
           />
         </div>
 
-        {/* ── Regular cards ── */}
+        {/* ── Regular cards (1fr) ── */}
         {regular.map((dest, i) => (
-          <DestinationCard
-            key={dest.destination}
-            destination={dest}
-            index={i + 1}
-            variant="regular"
-            onSelect={onSelect}
-          />
+          <div key={dest.destination}>
+            <DestinationCard
+              destination={dest}
+              index={i + 1}
+              variant="regular"
+              onSelect={onSelect}
+            />
+          </div>
         ))}
 
-        {/* ── Banner card (full width) ── */}
-        {destinations.length > 1 && (
-          <div key={banner.destination} className="lg:col-span-3">
+        {/* ── Banner card (full width 100%) ── */}
+        {banner && (
+          <div key={banner.destination} className="col-span-full">
             <DestinationCard
               destination={banner}
               index={destinations.length - 1}

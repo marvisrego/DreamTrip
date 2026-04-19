@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, useReducedMotion } from 'framer-motion'
-import { Plane, ChevronDown, ArrowUp } from 'lucide-react'
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
+import { Plane, ChevronDown, ArrowUp, ChevronRight } from 'lucide-react'
 
 /* ── Stagger variants ───────────────────────────────────────── */
 const container = {
@@ -15,13 +15,23 @@ const fadeUp = {
   visible: { opacity: 1, y: 0,  transition: { type: 'spring', stiffness: 260, damping: 22 } },
 }
 
+/* ── Mode options for the switcher ── */
+const MODES = [
+  { id: 'plan',    label: 'Plan Trip',   icon: '✈️' },
+  { id: 'think',   label: 'Thinking',    icon: '💭' },
+  { id: 'explore', label: 'Explore',     icon: '🧭' },
+]
+
 export default function LandingPage() {
   const navigate           = useNavigate()
   const shouldReduceMotion = useReducedMotion()
 
   const [activeVideo, setActiveVideo] = useState(1)
   const [input, setInput] = useState('')
+  const [activeMode, setActiveMode] = useState(MODES[0])
+  const [showModeMenu, setShowModeMenu] = useState(false)
   const textareaRef = useRef(null)
+  const modeMenuRef = useRef(null)
   const videoRefs = [useRef(null), useRef(null), useRef(null), useRef(null)]
 
   useEffect(() => {
@@ -50,8 +60,19 @@ export default function LandingPage() {
     const el = textareaRef.current
     if (!el) return
     el.style.height = 'auto'
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px'
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px'
   }, [input])
+
+  // Close mode menu on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (modeMenuRef.current && !modeMenuRef.current.contains(e.target)) {
+        setShowModeMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const hasContent = input.trim().length > 0
 
@@ -119,45 +140,219 @@ export default function LandingPage() {
             Describe your dream &nbsp;·&nbsp; We'll plan the trip
           </motion.p>
 
-          {/* ── Clean ChatGPT-style Input ── */}
+          {/* ═══════════════════════════════════════════
+              Professional Chat Input — Pill Design
+              ═══════════════════════════════════════════ */}
           <motion.div
             variants={fadeUp}
-            className="w-full max-w-2xl"
+            className="w-full max-w-[720px]"
           >
-            <div className="relative flex items-end rounded-3xl bg-white/[0.07] border border-white/[0.1] backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.3)] transition-all duration-200 focus-within:border-white/[0.2] focus-within:bg-white/[0.09]">
-              {/* Textarea */}
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value.slice(0, 200))}
-                onKeyDown={handleKeyDown}
-                rows={1}
-                placeholder="Describe your dream trip..."
-                className="flex-1 bg-transparent border-none outline-none resize-none text-base text-white placeholder:text-white/35 px-6 py-4 min-h-[56px] max-h-[120px] leading-relaxed font-[var(--font-body)]"
-                style={{ scrollbarWidth: 'none' }}
-              />
+            <div
+              className="chat-input-container"
+              style={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                borderRadius: '32px',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                boxShadow: '0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)',
+                padding: '8px',
+                transition: 'border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease',
+                position: 'relative',
+                fontFamily: "var(--font-body)",
+              }}
+              onFocus={() => {}}
+            >
+              {/* ── Textarea ── */}
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'flex-end',
+                minWidth: 0,
+                paddingLeft: '16px',
+                paddingRight: '8px',
+              }}>
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value.slice(0, 200))}
+                  onKeyDown={handleKeyDown}
+                  rows={1}
+                  placeholder="Describe your dream trip..."
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    resize: 'none',
+                    fontSize: '15px',
+                    lineHeight: '1.5',
+                    color: '#ffffff',
+                    fontFamily: 'var(--font-body)',
+                    padding: '10px 0',
+                    minHeight: '44px',
+                    maxHeight: '140px',
+                    overflowY: 'auto',
+                    scrollbarWidth: 'none',
+                  }}
+                  className="chat-textarea"
+                />
+              </div>
 
-              {/* Send button — ChatGPT style */}
-              <div className="p-2.5">
-                <button
-                  onClick={handleSend}
-                  disabled={!hasContent}
-                  aria-label="Send"
-                  className={`
-                    flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 cursor-pointer outline-none
-                    ${hasContent
-                      ? 'bg-white text-[#0a0f1e] shadow-lg hover:bg-white/90 hover:shadow-xl hover:scale-105 active:scale-95'
-                      : 'bg-white/10 text-white/25 cursor-default'
-                    }
-                  `}
-                >
-                  <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
-                </button>
+              {/* ── Right: Mode Switcher + Actions ── */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                gap: '6px',
+                paddingRight: '4px',
+                paddingBottom: '4px',
+                flexShrink: 0,
+              }}>
+                {/* Mode Switcher Pill */}
+                <div ref={modeMenuRef} style={{ position: 'relative' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowModeMenu(!showModeMenu)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 10px 4px 8px',
+                      borderRadius: '20px',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'rgba(255,255,255,0.05)',
+                      color: 'rgba(255,255,255,0.55)',
+                      fontSize: '12px',
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+                      e.currentTarget.style.color = 'rgba(255,255,255,0.85)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                      e.currentTarget.style.color = 'rgba(255,255,255,0.55)'
+                    }}
+                  >
+                    <span>{activeMode.icon}</span>
+                    <span>{activeMode.label}</span>
+                    <ChevronDown className="w-3 h-3" style={{
+                      transition: 'transform 0.2s ease',
+                      transform: showModeMenu ? 'rotate(180deg)' : 'rotate(0)',
+                    }} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <AnimatePresence>
+                    {showModeMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 4, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        style={{
+                          position: 'absolute',
+                          bottom: 'calc(100% + 6px)',
+                          right: 0,
+                          background: 'rgba(20, 22, 30, 0.97)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '14px',
+                          boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+                          backdropFilter: 'blur(20px)',
+                          padding: '4px',
+                          minWidth: '160px',
+                          zIndex: 60,
+                        }}
+                      >
+                        {MODES.map((mode) => (
+                          <button
+                            key={mode.id}
+                            onClick={() => { setActiveMode(mode); setShowModeMenu(false) }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              width: '100%',
+                              padding: '8px 12px',
+                              borderRadius: '10px',
+                              border: 'none',
+                              background: activeMode.id === mode.id ? 'rgba(255,255,255,0.08)' : 'transparent',
+                              color: activeMode.id === mode.id ? '#fff' : 'rgba(255,255,255,0.6)',
+                              fontSize: '13px',
+                              fontFamily: 'var(--font-body)',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                              textAlign: 'left',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (activeMode.id !== mode.id) {
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
+                                e.currentTarget.style.color = 'rgba(255,255,255,0.85)'
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (activeMode.id !== mode.id) {
+                                e.currentTarget.style.background = 'transparent'
+                                e.currentTarget.style.color = 'rgba(255,255,255,0.6)'
+                              }
+                            }}
+                          >
+                            <span>{mode.icon}</span>
+                            <span>{mode.label}</span>
+                            {activeMode.id === mode.id && (
+                              <ChevronRight className="w-3 h-3 ml-auto" style={{ color: 'var(--color-accent)' }} />
+                            )}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Action Row: Mic + Send */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}>
+                  {/* Send Button — White circle when active */}
+                  <motion.button
+                    onClick={handleSend}
+                    disabled={!hasContent}
+                    aria-label="Send"
+                    whileHover={hasContent ? { scale: 1.08 } : {}}
+                    whileTap={hasContent ? { scale: 0.92 } : {}}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                    style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '50%',
+                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: hasContent ? 'pointer' : 'default',
+                      transition: 'all 0.25s ease',
+                      background: hasContent ? '#ffffff' : 'rgba(255,255,255,0.08)',
+                      color: hasContent ? '#0a0f1e' : 'rgba(255,255,255,0.2)',
+                      boxShadow: hasContent ? '0 2px 12px rgba(255,255,255,0.2)' : 'none',
+                    }}
+                  >
+                    <ArrowUp className="w-[18px] h-[18px]" strokeWidth={2.5} />
+                  </motion.button>
+                </div>
               </div>
             </div>
 
             {/* Character counter */}
-            <div className="flex justify-end mt-2 px-2">
+            <div className="flex justify-end mt-2 px-4">
               <span className={`text-xs font-[var(--font-body)] transition-colors ${input.length > 180 ? 'text-red-400' : 'text-white/20'}`}>
                 {input.length}/200
               </span>

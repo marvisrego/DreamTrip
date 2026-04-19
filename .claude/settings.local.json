@@ -4,7 +4,18 @@
       "Bash(xxd /c/Users/marvi/OneDrive/Documents/MDX/LLM/HACKATHON/prompy)",
       "Bash(npx skills:*)",
       "Bash(npm run:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(bash *)",
+      "Bash(xargs cat *)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"luxury travel AI chat modal premium dark\" --design-system -f markdown)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"luxury travel AI chat modal premium dark\" --design-system)",
+      "Bash(python3 /c/Users/marvi/OneDrive/Documents/MDX/LLM/HACKATHON/.claude/skills/ui-ux-pro-max/scripts/search.py \"luxury travel AI chat modal premium dark\" --design-system)",
+      "Bash(python3 \".claude/skills/ui-ux-pro-max/scripts/search.py\" \"luxury travel AI chat modal premium dark\" --design-system)",
+      "Bash(cmd /c \"python .claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py \\\\\"luxury travel AI chat modal premium dark\\\\\" --design-system\")",
+      "Bash(cmd *)",
+      "Bash(where python *)",
+      "Bash(C:/Users/marvi/AppData/Local/Microsoft/WindowsApps/python.exe *)",
+      "Bash(dir /b /s \"C:\\\\Users\\\\marvi\\\\OneDrive\\\\Documents\\\\MDX\\\\LLM\\\\HACKATHON\\\\.claude\\\\skills\\\\ui-ux-pro-max\")"
     ]
   }
 }

@@ -1,0 +1,100 @@
+<h2>Which scroll animation style for the Itinerary?</h2>
+<p class="subtitle">Each day card appears as you scroll down — pick the feel that matches DreamTrip's cinematic vibe</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0f1e;padding:20px;min-height:220px;display:flex;flex-direction:column;gap:12px;justify-content:center;">
+      <!-- Simulate staggered fade-up reveal -->
+      <div style="animation:fadeUpA 0.6s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-left:3px solid #d4a84b;border-radius:12px;padding:14px;font-family:sans-serif;">
+        <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:6px">DAY 1</div>
+        <div style="font-size:14px;color:#fff;font-weight:600">Arrival & Old Town Wander</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">Morning · Afternoon · Evening</div>
+      </div>
+      <div style="animation:fadeUpA 0.6s 0.15s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-left:3px solid #d4a84b;border-radius:12px;padding:14px;font-family:sans-serif;">
+        <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:6px">DAY 2</div>
+        <div style="font-size:14px;color:#fff;font-weight:600">Beaches & Sunset Dining</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">Morning · Afternoon · Evening</div>
+      </div>
+      <div style="animation:fadeUpA 0.6s 0.3s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-left:3px solid #d4a84b;border-radius:12px;padding:14px;font-family:sans-serif;">
+        <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:6px">DAY 3</div>
+        <div style="font-size:14px;color:#fff;font-weight:600">Markets & Cultural Immersion</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">Morning · Afternoon · Evening</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Staggered Fade + Rise</h3>
+      <p>Each card fades in and rises from below with a spring bounce. Clean, editorial. Similar to Linear / Notion product pages.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0f1e;padding:20px;min-height:220px;display:flex;flex-direction:column;gap:12px;justify-content:center;">
+      <!-- Simulate reveal with blur + scale -->
+      <div style="animation:blurReveal 0.7s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-left:3px solid #d4a84b;border-radius:12px;padding:14px;font-family:sans-serif;">
+        <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:6px">DAY 1</div>
+        <div style="font-size:14px;color:#fff;font-weight:600">Arrival & Old Town Wander</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">Morning · Afternoon · Evening</div>
+      </div>
+      <div style="animation:blurReveal 0.7s 0.18s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-left:3px solid #d4a84b;border-radius:12px;padding:14px;font-family:sans-serif;">
+        <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:6px">DAY 2</div>
+        <div style="font-size:14px;color:#fff;font-weight:600">Beaches & Sunset Dining</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">Morning · Afternoon · Evening</div>
+      </div>
+      <div style="animation:blurReveal 0.7s 0.36s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-left:3px solid #d4a84b;border-radius:12px;padding:14px;font-family:sans-serif;">
+        <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:6px">DAY 3</div>
+        <div style="font-size:14px;color:#fff;font-weight:600">Markets & Cultural Immersion</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">Morning · Afternoon · Evening</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Blur-to-Focus Reveal</h3>
+      <p>Cards emerge from blur + slight scale, like a camera coming into focus. Premium cinematic feel. Used by Apple and high-end travel brands.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0f1e;padding:20px;min-height:220px;display:flex;flex-direction:column;gap:12px;justify-content:center;overflow:hidden;">
+      <!-- Timeline reveal: line draws down, then card slides in -->
+      <div style="position:relative;padding-left:24px;">
+        <div style="position:absolute;left:5px;top:0;width:2px;height:100%;background:linear-gradient(to bottom,#d4a84b,rgba(212,168,75,0.1));animation:growLine 1.2s ease forwards;transform-origin:top;"></div>
+        <div style="animation:slideRight 0.5s 0.1s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-radius:12px;padding:12px;font-family:sans-serif;margin-bottom:10px;">
+          <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:4px">DAY 1</div>
+          <div style="font-size:13px;color:#fff;font-weight:600">Arrival & Old Town Wander</div>
+        </div>
+        <div style="animation:slideRight 0.5s 0.35s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-radius:12px;padding:12px;font-family:sans-serif;margin-bottom:10px;">
+          <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:4px">DAY 2</div>
+          <div style="font-size:13px;color:#fff;font-weight:600">Beaches & Sunset Dining</div>
+        </div>
+        <div style="animation:slideRight 0.5s 0.6s ease forwards;opacity:0;background:rgba(212,168,75,0.08);border:1px solid rgba(212,168,75,0.2);border-radius:12px;padding:12px;font-family:sans-serif;">
+          <div style="font-size:10px;color:#d4a84b;letter-spacing:0.2em;margin-bottom:4px">DAY 3</div>
+          <div style="font-size:13px;color:#fff;font-weight:600">Markets & Cultural Immersion</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Timeline Draw + Slide In</h3>
+      <p>The gold timeline line draws downward first, then each card slides in from the left. Narrative, journey-like feel. Great for itinerary storytelling.</p>
+    </div>
+  </div>
+
+</div>
+
+<style>
+@keyframes fadeUpA {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes blurReveal {
+  from { opacity:0; transform:scale(0.96); filter:blur(6px); }
+  to   { opacity:1; transform:scale(1); filter:blur(0); }
+}
+@keyframes slideRight {
+  from { opacity:0; transform:translateX(-20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes growLine {
+  from { transform:scaleY(0); }
+  to   { transform:scaleY(1); }
+}
+</style>

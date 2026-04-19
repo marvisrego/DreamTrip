@@ -267,3 +267,146 @@ input, textarea, select { font-family: var(--font-body); }
   -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
+
+/* ═══════════════════════════════════════════════
+   CHAT INPUT (Landing Page)
+   ═══════════════════════════════════════════════ */
+.chat-textarea::-webkit-scrollbar {
+  display: none;
+}
+.chat-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+.chat-input-container:focus-within {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(255,255,255,0.05) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   TAG PILL (Overflow-safe)
+   ═══════════════════════════════════════════════ */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: fit-content;
+  padding: 6px 18px;
+  white-space: nowrap;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  gap: 6px;
+  line-height: 1;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.tag-pill:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+}
+.tag-pill--gold {
+  border-color: rgba(212, 168, 75, 0.3);
+  color: var(--color-accent);
+  background: rgba(212, 168, 75, 0.06);
+}
+.tag-pill--gold:hover {
+  border-color: rgba(212, 168, 75, 0.5);
+  background: rgba(212, 168, 75, 0.1);
+  box-shadow: 0 0 12px rgba(212,168,75,0.08);
+}
+
+/* ═══════════════════════════════════════════════
+   SEARCH CHIP (Results page header)
+   ═══════════════════════════════════════════════ */
+.search-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ═══════════════════════════════════════════════
+   MATCH RING (Glowing circle badge)
+   ═══════════════════════════════════════════════ */
+.match-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+.match-ring--gold {
+  background: rgba(212, 168, 75, 0.1);
+  border: 2px solid rgba(212, 168, 75, 0.5);
+  box-shadow: 0 0 18px rgba(212,168,75,0.25);
+}
+.match-ring--green {
+  background: rgba(52, 211, 153, 0.08);
+  border: 2px solid rgba(52, 211, 153, 0.4);
+  box-shadow: 0 0 14px rgba(52,211,153,0.15);
+}
+.match-ring--dim {
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ═══════════════════════════════════════════════
+   LUX BUTTON (Gold gradient CTA)
+   ═══════════════════════════════════════════════ */
+.lux-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 28px;
+  border-radius: 32px;
+  border: none;
+  min-width: fit-content;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #fbbf24 0%, #ea580c 100%);
+  color: #0a0f1e;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(212,168,75,0.3), 0 2px 6px rgba(0,0,0,0.2);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  outline: none;
+}
+.lux-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 14px 28px rgba(234, 88, 12, 0.4), 0 10px 10px rgba(0,0,0,0.2);
+}
+.lux-btn:active {
+  transform: scale(0.97);
+}
+.lux-btn--outline {
+  background: transparent;
+  border: 1px solid rgba(212, 168, 75, 0.35);
+  color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(212,168,75,0.06);
+}
+.lux-btn--outline:hover {
+  background: rgba(212, 168, 75, 0.06);
+  border-color: rgba(212, 168, 75, 0.55);
+  box-shadow: 0 0 20px rgba(212,168,75,0.12);
+  transform: scale(1.04);
+}

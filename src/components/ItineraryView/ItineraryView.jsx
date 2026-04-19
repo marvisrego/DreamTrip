@@ -1,17 +1,11 @@
 // source_handbook: week11-hackathon-preparation
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { useMemo, useRef } from 'react'
+import { motion, useScroll, useSpring } from 'framer-motion'
 import DayCard from './DayCard'
 import Loader from '@/components/UI/Loader'
 
-/**
- * Parse streaming itinerary text into individual day blocks.
- * Splits on "Day N:" pattern and returns an array of day texts.
- */
 function parseDays(text) {
   if (!text) return []
-
-  // Split by "Day N:" pattern, keeping the delimiter
   const parts = text.split(/(?=Day\s+\d+:)/i)
   return parts
     .map(part => part.trim())
@@ -20,6 +14,14 @@ function parseDays(text) {
 
 export default function ItineraryView({ streamedText, loading }) {
   const days = useMemo(() => parseDays(streamedText), [streamedText])
+  const timelineRef = useRef(null)
+
+  // Scroll-driven timeline line — draws as the user scrolls through the list
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ['start 0.85', 'end 0.25'],
+  })
+  const scaleY = useSpring(scrollYProgress, { stiffness: 60, damping: 20, restDelta: 0.001 })
 
   if (loading && !streamedText) {
     return <Loader text="Crafting your perfect itinerary..." />
@@ -30,22 +32,16 @@ export default function ItineraryView({ streamedText, loading }) {
   }
 
   return (
-    <div className="relative">
-      {/* Vertical timeline line — refined gradient */}
-      <div className="absolute left-[5px] md:left-[5px] top-0 bottom-0 w-px timeline-line" />
-
-      {/* Day cards with staggered entrance */}
+    <div ref={timelineRef} className="relative">
+      {/* Scroll-driven timeline line */}
       <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: {},
-          visible: {
-            transition: { staggerChildren: 0.12 }
-          }
-        }}
-        className="space-y-2"
-      >
+        style={{ scaleY, transformOrigin: 'top' }}
+        className="absolute left-[5px] top-0 bottom-0 w-px timeline-line"
+      />
+      {/* Static dim track behind the animated line */}
+      <div className="absolute left-[5px] top-0 bottom-0 w-px bg-white/[0.04]" />
+
+      <div className="space-y-2">
         {days.map((dayText, index) => (
           <DayCard
             key={index}
@@ -54,7 +50,7 @@ export default function ItineraryView({ streamedText, loading }) {
             index={index}
           />
         ))}
-      </motion.div>
+      </div>
 
       {/* Streaming indicator */}
       {loading && days.length > 0 && (
