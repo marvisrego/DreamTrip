@@ -1,5 +1,6 @@
 // source_handbook: week11-hackathon-preparation
 import { useMemo } from 'react'
+import { motion } from 'framer-motion'
 import DayCard from './DayCard'
 import Loader from '@/components/UI/Loader'
 
@@ -30,11 +31,21 @@ export default function ItineraryView({ streamedText, loading }) {
 
   return (
     <div className="relative">
-      {/* Vertical timeline line */}
-      <div className="absolute left-[5px] md:left-[5px] top-0 bottom-0 w-px bg-gradient-to-b from-[var(--color-accent)]/50 via-[var(--color-accent)]/20 to-transparent" />
+      {/* Vertical timeline line — refined gradient */}
+      <div className="absolute left-[5px] md:left-[5px] top-0 bottom-0 w-px timeline-line" />
 
-      {/* Day cards */}
-      <div className="space-y-2">
+      {/* Day cards with staggered entrance */}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: { staggerChildren: 0.12 }
+          }
+        }}
+        className="space-y-2"
+      >
         {days.map((dayText, index) => (
           <DayCard
             key={index}
@@ -43,20 +54,24 @@ export default function ItineraryView({ streamedText, loading }) {
             index={index}
           />
         ))}
-      </div>
+      </motion.div>
 
       {/* Streaming indicator */}
       {loading && days.length > 0 && (
-        <div className="pl-8 md:pl-12 pt-4">
-          <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
-            <div className="flex gap-1">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="pl-8 md:pl-12 pt-4"
+        >
+          <div className="flex items-center gap-3 text-[var(--color-text-muted)]">
+            <div className="flex gap-1.5 p-3 rounded-2xl bg-[var(--color-bg-secondary)] border border-white/5">
               <span className="w-1.5 h-1.5 bg-[var(--color-accent)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
               <span className="w-1.5 h-1.5 bg-[var(--color-accent)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
               <span className="w-1.5 h-1.5 bg-[var(--color-accent)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
-            <span className="text-sm">Planning more days...</span>
+            <span className="text-sm font-[var(--font-body)]">Planning more days...</span>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   )

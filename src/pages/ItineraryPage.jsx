@@ -40,6 +40,7 @@ export default function ItineraryPage() {
   // Subtle parallax effect on scroll
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 500], [0, 150])
+  const heroOpacity = useTransform(scrollY, [0, 350], [1, 0])
 
   const generateItinerary = async () => {
     if (!destinationName || !vibe) return
@@ -85,8 +86,31 @@ export default function ItineraryPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] pb-24">
+      {/* Sticky navigation bar */}
+      <motion.nav
+        initial={{ y: -60 }}
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className="fixed top-0 left-0 right-0 z-50 nav-blur"
+      >
+        <div className="max-w-[var(--content-max)] mx-auto px-6 h-14 flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer min-w-[44px] min-h-[44px]"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium font-[var(--font-body)]">Back</span>
+          </button>
+          <span className="text-sm font-medium text-white/50 font-[var(--font-body)] truncate max-w-[200px]">
+            {destinationName}
+          </span>
+          <div className="w-[60px]" /> {/* Spacer for centering */}
+        </div>
+      </motion.nav>
+
       {/* Hero section */}
-      <div className="relative h-[50vh] min-h-[350px] overflow-hidden">
+      <div className="relative h-[55vh] min-h-[400px] overflow-hidden">
         {/* Background image */}
         {(imageLoading || !imageLoaded) && (
           <div className="absolute inset-0 shimmer bg-[var(--color-bg-secondary)]" />
@@ -103,49 +127,45 @@ export default function ItineraryPage() {
               }
             }}
             style={{ y }}
-            initial={{ scale: 1.05 }}
+            initial={{ scale: 1.08 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
+            transition={{ duration: 2, ease: 'easeOut' }}
             className={`
               absolute inset-0 w-full h-[120%] -top-[10%] object-cover
               ${imageLoaded ? 'opacity-100' : 'opacity-0'}
-              transition-opacity duration-500
+              transition-opacity duration-700
             `}
           />
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)] via-black/40 to-black/20" />
+        {/* Cinematic gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)] via-black/30 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
 
-        {/* Content overlay */}
-        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 max-w-6xl mx-auto">
-          <button
-            onClick={() => navigate(-1)}
-            className="absolute top-6 left-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back</span>
-          </button>
-
+        {/* Hero content */}
+        <motion.div
+          style={{ opacity: heroOpacity }}
+          className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 max-w-[var(--content-max)] mx-auto"
+        >
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.3, type: 'spring', stiffness: 200 }}
           >
             {destinationData?.countryCode && (
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-4">
                 <img
                   src={`https://flagcdn.com/w40/${destinationData.countryCode.toLowerCase()}.png`}
                   alt={destinationData.country}
                   className="w-6 rounded-sm"
                 />
-                <span className="text-sm text-white/70">
+                <span className="text-sm text-white/60 font-[var(--font-body)] tracking-wide">
                   {destinationData.country}
                 </span>
               </div>
             )}
 
-            <h1 className="text-4xl md:text-5xl font-[var(--font-heading)] font-bold text-white mb-3">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-4 leading-[1.1]">
               {destinationName}
             </h1>
 
@@ -160,42 +180,48 @@ export default function ItineraryPage() {
                 <Badge key={tag}>{tag}</Badge>
               ))}
               {!weatherLoading && weather && (
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-black/40 backdrop-blur-md text-white/90 text-sm font-medium">
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-black/40 backdrop-blur-md text-white/90 text-sm font-medium font-[var(--font-body)]">
                   <WeatherIcon className="w-4 h-4 text-amber-300" />
                   {weather.temp}°C {conditionText}
                 </div>
               )}
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Itinerary content wrapper */}
-      <div className="max-w-4xl mx-auto px-6 pt-10 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10">
+      <div className="max-w-4xl mx-auto px-6 pt-12 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10">
         
         {/* Main itinerary column */}
         <div>
-          <div className="flex items-center justify-between mb-8">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-2xl font-[var(--font-heading)] font-semibold text-white"
+          <div className="flex items-center justify-between mb-10">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
             >
-              Your Itinerary
-            </motion.h2>
+              <p className="text-[11px] font-bold text-[var(--color-accent)] uppercase tracking-[0.25em] mb-2 font-[var(--font-body)]">
+                Day by Day
+              </p>
+              <h2 className="text-2xl md:text-3xl font-[var(--font-heading)] font-semibold text-white">
+                Your Itinerary
+              </h2>
+            </motion.div>
             
             {streamedText && (
-              <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2">
-                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
-                {copied ? 'Copied' : 'Copy'}
-              </Button>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+                <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2">
+                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copied' : 'Copy'}
+                </Button>
+              </motion.div>
             )}
           </div>
 
         {error && (
           <div className="text-center py-8">
-            <p className="text-red-400 mb-4">{error}</p>
+            <p className="text-red-400 mb-4 font-[var(--font-body)]">{error}</p>
             <Button onClick={generateItinerary}>
               Try Again
             </Button>
@@ -207,8 +233,16 @@ export default function ItineraryPage() {
 
         {/* Sidebar wrapper */}
         <div className="hidden lg:block space-y-6">
-          <div className="glass-card overflow-hidden">
-            <div className="p-4 border-b border-white/5 font-semibold text-sm">Destination Map</div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
+            className="glass-card overflow-hidden sticky top-20"
+          >
+            <div className="p-4 border-b border-white/5 font-semibold text-sm font-[var(--font-heading)]">
+              <MapPin className="w-4 h-4 inline-block mr-2 text-[var(--color-accent)]" />
+              Destination Map
+            </div>
             <iframe
               title="Google Map"
               width="100%"
@@ -219,8 +253,7 @@ export default function ItineraryPage() {
               referrerPolicy="no-referrer-when-downgrade"
               src={`https://maps.google.com/maps?q=${encodeURIComponent(destinationName)}&t=&z=11&ie=UTF8&iwloc=&output=embed`}
             />
-            {/* Note: In absolute reality, a completely free map with zero keys can be done via OSM bounding boxes, but user said 'Google Maps embed just an iframe no api key needed', so we use the standard structure. However Google actually blocks this without a key currently. Let's use OpenStreetMap for a guaranteed keyless embed to fulfill the request cleanly without breaking. */}
-          </div>
+          </motion.div>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 // source_handbook: week11-hackathon-preparation
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Clock, Thermometer, Globe } from 'lucide-react'
+import { ArrowRight, Clock, Thermometer, Globe, Leaf } from 'lucide-react'
 import { useUnsplash } from '@/hooks/useUnsplash'
 import { getFallbackImageUrl } from '@/lib/unsplash'
 import Badge from '@/components/UI/Badge'
@@ -112,7 +112,18 @@ function FeaturedCard({ destination, onSelect, imageUrl, imageLoaded, setImageLo
               <Clock className="w-3 h-3" />{destination.bestFor}
             </span>
           )}
+          {destination.sustainabilityScore && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 text-emerald-400 text-[10px] font-medium">
+              <Leaf className="w-3 h-3" />Eco Rating: {destination.sustainabilityScore}/10
+            </span>
+          )}
         </div>
+
+        {destination.priceRange && (
+          <div className="mb-2 text-xl font-[var(--font-heading)] font-semibold text-[var(--color-accent)]">
+            {destination.priceRange} <span className="text-[10px] text-white/40 font-light uppercase tracking-widest ml-1">starting</span>
+          </div>
+        )}
 
         <p className="text-white/70 text-sm leading-relaxed mb-4 max-w-lg">
           {destination.reason}
@@ -201,6 +212,16 @@ function BannerCard({ destination, onSelect, imageUrl, imageLoaded, setImageLoad
           {destination.climate && (
             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-medium ${climateColour[destination.climate] || climateColour.Temperate}`}>
               <Thermometer className="w-3 h-3" />{destination.climate}
+            </span>
+          )}
+          {destination.priceRange && (
+            <span className="text-white font-semibold text-sm">
+              {destination.priceRange}
+            </span>
+          )}
+          {destination.sustainabilityScore && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 text-[10px]">
+              <Leaf className="w-2.5 h-2.5" /> Eco {destination.sustainabilityScore}
             </span>
           )}
         </div>
@@ -297,6 +318,16 @@ function RegularCard({ destination, onSelect, imageUrl, imageLoaded, setImageLoa
           {destination.tags?.map((tag) => (
             <Badge key={tag} className="text-[10px] px-2 py-0.5">{tag}</Badge>
           ))}
+          {destination.priceRange && (
+            <span className="text-white/90 text-[10px] font-bold">
+              {destination.priceRange}
+            </span>
+          )}
+          {destination.sustainabilityScore && (
+            <span className="flex items-center gap-1 text-emerald-400/80 text-[10px] font-medium">
+              <Leaf className="w-2.5 h-2.5" /> {destination.sustainabilityScore}
+            </span>
+          )}
         </div>
 
         <p className="text-xs text-[var(--color-text-muted)] leading-relaxed flex-1">

@@ -13,6 +13,8 @@ Each object in the array must include:
 - "reason": string — one sentence explaining why this destination matches the vibe
 - "tags": array of exactly 3 short tags (2-3 words each, e.g. "Budget-friendly", "Solo-friendly")
 - "bestFor": string — suggested trip duration (e.g. "7–10 days")
+- "priceRange": string — Estimated starting price with currency (e.g. "From $1,200")
+- "sustainabilityScore": number — 1-10 rating on eco-friendliness and local impact
 - "matchScore": integer between 75 and 99 — how well this destination matches the vibe (first result should be highest)
 - "climate": string — one word climate descriptor (e.g. "Tropical", "Mediterranean", "Alpine", "Desert", "Temperate", "Arctic")
 - "continent": string — continent name (e.g. "Asia", "Europe", "Africa", "Americas", "Oceania")
