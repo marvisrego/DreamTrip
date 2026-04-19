@@ -55,7 +55,7 @@ export default function LandingPage() {
               activeVideo === n ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <source src={n === 1 ? '/video.mp4' : `/video${n}.mp4`} type="video/mp4" />
+            <source src={n === 1 ? 'https://d12is9znbjsq5c.cloudfront.net/video.mp4' : `https://d12is9znbjsq5c.cloudfront.net/video${n}.mp4`} type="video/mp4" />
           </video>
         ))}
 
