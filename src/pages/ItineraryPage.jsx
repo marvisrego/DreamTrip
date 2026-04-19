@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ArrowLeft, Clock, MapPin } from 'lucide-react'
+import { ArrowLeft, Clock, MapPin, Plane, Calendar, Copy, Check } from 'lucide-react'
 import { streamItinerary } from '@/lib/api'
 import { useUnsplash } from '@/hooks/useUnsplash'
 import { useWeather } from '@/hooks/useWeather'
@@ -13,7 +13,7 @@ import ChatFollowUp from '@/components/ChatFollowUp/ChatFollowUp'
 import Badge from '@/components/UI/Badge'
 import Button from '@/components/UI/Button'
 import ImageSkeleton from '@/components/Skeleton/ImageSkeleton'
-import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Copy, Check } from 'lucide-react'
+import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning } from 'lucide-react'
 
 const WeatherIcons = { Sun, Cloud, CloudRain, CloudSnow, CloudLightning }
 
@@ -71,7 +71,7 @@ export default function ItineraryPage() {
   if (!destinationName) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-[var(--color-text-muted)]">No destination selected.</p>
+        <p className="text-[var(--color-text-muted)] font-[var(--font-body)]">No destination selected.</p>
         <Button onClick={() => navigate('/')}>Back to Home</Button>
       </div>
     )
@@ -85,8 +85,8 @@ export default function ItineraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] pb-24">
-      {/* Sticky navigation bar */}
+    <div className="min-h-screen bg-[var(--color-bg-primary)] pb-32">
+      {/* ── Sticky top navigation ── */}
       <motion.nav
         initial={{ y: -60 }}
         animate={{ y: 0 }}
@@ -96,21 +96,24 @@ export default function ItineraryPage() {
         <div className="max-w-[var(--content-max)] mx-auto px-6 h-14 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer min-w-[44px] min-h-[44px]"
+            className="flex items-center gap-2.5 text-white/60 hover:text-white transition-colors cursor-pointer min-w-[44px] min-h-[44px] rounded-full hover:bg-white/5 px-3 -ml-3"
             aria-label="Go back"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-medium font-[var(--font-body)]">Back</span>
+            <span className="text-sm font-medium font-[var(--font-body)] tracking-wide">Back</span>
           </button>
-          <span className="text-sm font-medium text-white/50 font-[var(--font-body)] truncate max-w-[200px]">
-            {destinationName}
-          </span>
-          <div className="w-[60px]" /> {/* Spacer for centering */}
+          <div className="flex items-center gap-2">
+            <Plane className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+            <span className="text-sm font-[var(--font-heading)] font-semibold text-white/80 truncate max-w-[240px]">
+              {destinationName}
+            </span>
+          </div>
+          <div className="w-[76px]" /> {/* Spacer for centering */}
         </div>
       </motion.nav>
 
-      {/* Hero section */}
-      <div className="relative h-[55vh] min-h-[400px] overflow-hidden">
+      {/* ── Hero section ── */}
+      <div className="relative h-[55vh] min-h-[420px] overflow-hidden">
         {/* Background image */}
         {(imageLoading || !imageLoaded) && (
           <div className="absolute inset-0 shimmer bg-[var(--color-bg-secondary)]" />
@@ -153,26 +156,26 @@ export default function ItineraryPage() {
             transition={{ duration: 0.8, delay: 0.3, type: 'spring', stiffness: 200 }}
           >
             {destinationData?.countryCode && (
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2.5 mb-4">
                 <img
                   src={`https://flagcdn.com/w40/${destinationData.countryCode.toLowerCase()}.png`}
                   alt={destinationData.country}
-                  className="w-6 rounded-sm"
+                  className="w-7 rounded-sm shadow-lg"
                 />
-                <span className="text-sm text-white/60 font-[var(--font-body)] tracking-wide">
+                <span className="text-sm text-white/60 font-[var(--font-body)] tracking-wide uppercase">
                   {destinationData.country}
                 </span>
               </div>
             )}
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-4 leading-[1.1]">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-5 leading-[1.05] tracking-tight">
               {destinationName}
             </h1>
 
             <div className="flex flex-wrap items-center gap-3">
               {destinationData?.bestFor && (
                 <Badge>
-                  <Clock className="w-3 h-3 mr-1" />
+                  <Clock className="w-3 h-3 mr-1.5" />
                   {destinationData.bestFor}
                 </Badge>
               )}
@@ -180,9 +183,9 @@ export default function ItineraryPage() {
                 <Badge key={tag}>{tag}</Badge>
               ))}
               {!weatherLoading && weather && (
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-black/40 backdrop-blur-md text-white/90 text-sm font-medium font-[var(--font-body)]">
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/12 bg-black/40 backdrop-blur-md text-white/90 text-sm font-medium font-[var(--font-body)]">
                   <WeatherIcon className="w-4 h-4 text-amber-300" />
-                  {weather.temp}°C {conditionText}
+                  {weather.temp}°C · {conditionText}
                 </div>
               )}
             </div>
@@ -190,70 +193,122 @@ export default function ItineraryPage() {
         </motion.div>
       </div>
 
-      {/* Itinerary content wrapper */}
-      <div className="max-w-4xl mx-auto px-6 pt-12 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10">
-        
-        {/* Main itinerary column */}
-        <div>
-          <div className="flex items-center justify-between mb-10">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <p className="text-[11px] font-bold text-[var(--color-accent)] uppercase tracking-[0.25em] mb-2 font-[var(--font-body)]">
-                Day by Day
-              </p>
-              <h2 className="text-2xl md:text-3xl font-[var(--font-heading)] font-semibold text-white">
-                Your Itinerary
-              </h2>
-            </motion.div>
-            
-            {streamedText && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-                <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2">
-                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Copied' : 'Copy'}
-                </Button>
-              </motion.div>
-            )}
-          </div>
+      {/* ── Full-width itinerary content ── */}
+      <div className="max-w-[var(--content-max)] mx-auto px-6 pt-12">
 
-        {error && (
-          <div className="text-center py-8">
-            <p className="text-red-400 mb-4 font-[var(--font-body)]">{error}</p>
-            <Button onClick={generateItinerary}>
-              Try Again
-            </Button>
-          </div>
-        )}
-
-        <ItineraryView streamedText={streamedText} loading={loading} />
-        </div>
-
-        {/* Sidebar wrapper */}
-        <div className="hidden lg:block space-y-6">
+        {/* Section header */}
+        <div className="flex items-end justify-between mb-10 pb-6 border-b border-white/[0.06]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-            className="glass-card overflow-hidden sticky top-20"
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
           >
-            <div className="p-4 border-b border-white/5 font-semibold text-sm font-[var(--font-heading)]">
-              <MapPin className="w-4 h-4 inline-block mr-2 text-[var(--color-accent)]" />
-              Destination Map
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-[var(--color-accent)]" />
+              </div>
+              <p className="text-[11px] font-bold text-[var(--color-accent)] uppercase tracking-[0.3em] font-[var(--font-body)]">
+                Day by Day
+              </p>
             </div>
-            <iframe
-              title="Google Map"
-              width="100%"
-              height="250"
-              style={{ border: 0 }}
-              loading="lazy"
-              allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(destinationName)}&t=&z=11&ie=UTF8&iwloc=&output=embed`}
-            />
+            <h2 className="text-3xl md:text-4xl font-[var(--font-heading)] font-bold text-white tracking-tight">
+              Your Itinerary
+            </h2>
           </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7 }}
+            className="flex items-center gap-3"
+          >
+            {streamedText && (
+              <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2 rounded-full">
+                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy itinerary'}</span>
+              </Button>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Two-column layout: itinerary + map side by side on large screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-12">
+          {/* Main itinerary — fills available width */}
+          <div>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-12 glass-card mb-8"
+              >
+                <p className="text-red-400 mb-4 font-[var(--font-body)] text-sm">{error}</p>
+                <Button onClick={generateItinerary}>
+                  Try Again
+                </Button>
+              </motion.div>
+            )}
+
+            <ItineraryView streamedText={streamedText} loading={loading} />
+          </div>
+
+          {/* Sidebar — map + quick info */}
+          <div className="hidden lg:block">
+            <div className="sticky top-20 space-y-6">
+              {/* Map card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
+                className="glass-card overflow-hidden"
+              >
+                <div className="px-5 py-4 border-b border-white/5 flex items-center gap-2.5">
+                  <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
+                  <span className="font-[var(--font-heading)] font-semibold text-sm text-white">Destination Map</span>
+                </div>
+                <iframe
+                  title="Google Map"
+                  width="100%"
+                  height="280"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(destinationName)}&t=&z=11&ie=UTF8&iwloc=&output=embed`}
+                />
+              </motion.div>
+
+              {/* Quick info card */}
+              {destinationData && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
+                  className="glass-card p-5"
+                >
+                  <h3 className="font-[var(--font-heading)] font-semibold text-sm text-white mb-4">Quick Info</h3>
+                  <div className="space-y-3">
+                    {destinationData.reason && (
+                      <p className="text-sm text-[var(--color-text-muted)] leading-relaxed font-[var(--font-body)]">
+                        {destinationData.reason}
+                      </p>
+                    )}
+                    {destinationData.priceRange && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-[var(--color-text-muted)] font-[var(--font-body)]">Starting from</span>
+                        <span className="font-[var(--font-heading)] font-bold text-[var(--color-accent)]">{destinationData.priceRange}</span>
+                      </div>
+                    )}
+                    {destinationData.sustainabilityScore && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-[var(--color-text-muted)] font-[var(--font-body)]">Eco Rating</span>
+                        <span className="font-[var(--font-body)] font-semibold text-emerald-400">{destinationData.sustainabilityScore}/10</span>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

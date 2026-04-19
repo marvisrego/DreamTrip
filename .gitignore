@@ -20,3 +20,10 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Large media (hosted on CloudFront CDN)
+*.mp4
+
+# Scratch / debug
+scratch/
+err.txt
