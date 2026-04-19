@@ -12,7 +12,7 @@ const Textarea = React.forwardRef(({ className, ...props }, ref) => (
     ref={ref}
     rows={1}
     className={cn(
-      'flex w-full rounded-md border-none bg-transparent px-4 py-3 text-base text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px] resize-none overflow-hidden prompt-textarea',
+      'flex w-full rounded-md border-none bg-transparent px-4 py-3 text-base text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px] resize-none prompt-textarea leading-normal',
       className
     )}
     {...props}
@@ -247,8 +247,8 @@ const PromptInput = React.forwardRef(({
         <div
           ref={ref}
           className={cn(
-            'rounded-3xl border border-white/10 bg-[#0a0f1e]/95 p-2 shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 backdrop-blur-xl overflow-hidden',
-            isLoading && 'border-[var(--color-accent)]/50 shadow-[0_0_20px_rgba(212,168,75,0.1)]',
+            'rounded-3xl border border-white/10 bg-[#0a0f1e]/95 p-2 shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 backdrop-blur-xl',
+            isLoading && 'border-white/20',
             className
           )}
           onDragOver={onDragOver}

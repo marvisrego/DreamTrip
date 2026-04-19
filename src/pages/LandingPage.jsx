@@ -106,15 +106,12 @@ export default function LandingPage() {
             variants={fadeUp}
             className="w-full max-w-2xl"
           >
-            {/* Frosted pill wrapper — focus-within glow */}
-            <div className="relative rounded-[2rem] p-[1px] transition-all duration-300 focus-within:shadow-[0_0_0_1px_rgba(212,168,75,0.6),0_0_28px_rgba(212,168,75,0.18)]">
-              <PromptInputBox
-                onSend={handleSend}
-                placeholder="e.g. solo beaches, under £1000, warm weather"
-                maxChars={200}
-                className="rounded-[2rem] !bg-white/[0.06] border-white/[0.12] backdrop-blur-2xl"
-              />
-            </div>
+            <PromptInputBox
+              onSend={handleSend}
+              placeholder="e.g. solo beaches, under £1000, warm weather"
+              maxChars={200}
+              className="rounded-[2rem] !bg-white/[0.06] !border-white/[0.08] backdrop-blur-2xl"
+            />
           </motion.div>
 
           {/* ── Provider hint ── */}
