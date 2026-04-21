@@ -1,4 +1,4 @@
-// System prompt for follow-up chat refinement (Groq / Llama 3.3 70B)
+// System prompt for follow-up chat refinement (GPT-4o mini)
 
 /**
  * Build the chat system prompt with full context.

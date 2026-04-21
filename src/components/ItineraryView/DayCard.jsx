@@ -105,13 +105,13 @@ export default function DayCard({ dayText, dayNumber }) {
           />
         </div>
 
-        {/* Day-number watermark — fixed inside, no overflow needed */}
+        {/* Day-number watermark — anchored bottom-right, purely decorative */}
         <div
           aria-hidden="true"
           style={{
             position: 'absolute',
             right: '20px',
-            top: '10px',
+            bottom: '10px',
             fontSize: 'clamp(100px, 12vw, 160px)',
             fontFamily: 'var(--font-heading)',
             fontWeight: 700,
@@ -125,7 +125,7 @@ export default function DayCard({ dayText, dayNumber }) {
           {dayNumber}
         </div>
 
-        <div className="relative" style={{ padding: '28px 32px', zIndex: 1 }}>
+        <div className="relative" style={{ padding: '24px', zIndex: 1 }}>
 
           {/* ── Day header ── */}
           <motion.div variants={headerVariants}>
@@ -251,26 +251,19 @@ export default function DayCard({ dayText, dayNumber }) {
                     >
                       {label}
                     </p>
-                    {/* Body text — fades out gracefully at bottom when very long */}
-                    <div style={{ position: 'relative' }}>
-                      <p
-                        style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '14px',
-                          color: 'rgba(255,255,255,0.88)',
-                          lineHeight: 1.75,
-                          margin: 0,
-                          overflowWrap: 'break-word',
-                          wordBreak: 'break-word',
-                          overflow: 'hidden',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 8,
-                          WebkitBoxOrient: 'vertical',
-                        }}
-                      >
-                        {content}
-                      </p>
-                    </div>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '14px',
+                        color: 'rgba(255,255,255,0.88)',
+                        lineHeight: 1.75,
+                        margin: 0,
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {content}
+                    </p>
                   </div>
                 </div>
               </motion.div>

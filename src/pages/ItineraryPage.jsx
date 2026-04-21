@@ -344,7 +344,7 @@ export default function ItineraryPage() {
       <motion.div
         animate={{ opacity: (loading || !imageLoaded) ? 0 : 1 }}
         transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
-        className="max-w-[var(--content-max)] mx-auto px-6 pt-12"
+        className="max-w-[1400px] mx-auto px-6 pt-12"
       >
 
         {/* Section header */}
@@ -382,26 +382,23 @@ export default function ItineraryPage() {
           </motion.div>
         </div>
 
-        {/* Two-column layout: itinerary + map side by side on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-12">
+        {/* Two-column layout: 2fr itinerary + 1fr sticky sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10">
           {/* Main itinerary — fills available width */}
           <div>
-            <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center py-12 glass-card mb-8"
-                >
-                  <p className="text-red-400 mb-4 font-[var(--font-body)] text-sm">{error}</p>
-                  <Button onClick={generateItinerary}>
-                    Try Again
-                  </Button>
-                </motion.div>
-              )}
-
-              <ItineraryView streamedText={streamedText} loading={loading} />
-            </div>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-12 glass-card mb-8"
+              >
+                <p className="text-red-400 mb-4 font-[var(--font-body)] text-sm">{error}</p>
+                <Button onClick={generateItinerary}>
+                  Try Again
+                </Button>
+              </motion.div>
+            )}
+            <ItineraryView streamedText={streamedText} loading={loading} />
           </div>
 
           {/* Sidebar — quick info */}
@@ -413,10 +410,33 @@ export default function ItineraryPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
-                  className="glass-card min-w-0"
-                  style={{ padding: '20px 24px' }}
+                  className="min-w-0"
+                  style={{
+                    padding: '24px',
+                    borderRadius: 'var(--radius-card)',
+                    background: 'rgba(10,15,30,0.72)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(212,168,75,0.35)',
+                    boxShadow: '0 0 40px rgba(212,168,75,0.08), 0 16px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(212,168,75,0.06)',
+                  }}
                 >
-                  <h3 className="font-[var(--font-heading)] font-semibold text-sm text-white mb-4">Quick Info</h3>
+                  <div className="flex items-center gap-2 mb-5">
+                    <div style={{
+                      width: '6px', height: '6px', borderRadius: '50%',
+                      background: 'var(--color-accent)',
+                      boxShadow: '0 0 8px rgba(212,168,75,0.7)',
+                    }} />
+                    <h3 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 600,
+                      fontSize: '11px',
+                      color: 'var(--color-accent)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.22em',
+                      margin: 0,
+                    }}>Quick Info</h3>
+                  </div>
                   <div className="space-y-3 min-w-0">
                     {destinationData.reason && (
                       <p className="text-sm text-[var(--color-text-muted)] leading-relaxed font-[var(--font-body)] break-words">

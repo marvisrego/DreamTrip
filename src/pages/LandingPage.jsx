@@ -498,12 +498,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Character counter */}
-            <div className="flex justify-end mt-2 px-4">
-              <span className={`text-xs font-[var(--font-body)] transition-colors ${input.length > 180 ? 'text-red-400' : 'text-white/20'}`}>
-                {input.length}/200
-              </span>
-            </div>
           </motion.div>
 
           {/* ── Provider hint ── */}
@@ -511,7 +505,7 @@ export default function LandingPage() {
             variants={fadeUp}
             className="mt-5 text-[11px] tracking-[0.18em] uppercase text-white/25 font-[var(--font-body)]"
           >
-            Powered by Groq &middot; Llama 3.3 70B
+            Powered by GitHub Models &middot; GPT-4o mini
           </motion.p>
         </motion.div>
       </div>
