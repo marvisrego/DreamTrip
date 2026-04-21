@@ -1,18 +1,18 @@
 // source_handbook: week11-hackathon-preparation
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { ArrowLeft, Clock, MapPin, Plane, Calendar, Copy, Check } from 'lucide-react'
-import { streamItinerary } from '@/lib/api'
-import { useUnsplash } from '@/hooks/useUnsplash'
-import { useWeather } from '@/hooks/useWeather'
-import { getFallbackImageUrl } from '@/lib/unsplash'
-import { getItineraryPrompt } from '@/prompts/itineraryPrompt'
-import ItineraryView from '@/components/ItineraryView/ItineraryView'
-import ChatFollowUp from '@/components/ChatFollowUp/ChatFollowUp'
-import Badge from '@/components/UI/Badge'
-import Button from '@/components/UI/Button'
-import ImageSkeleton from '@/components/Skeleton/ImageSkeleton'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { ArrowLeft, Clock, MapPin, Plane, Calendar, Copy, Check, Sparkles, ArrowUpRight } from 'lucide-react'
+import { streamItinerary } from '../lib/api.js'
+import { useUnsplash } from '../hooks/useUnsplash'
+import { useWeather } from '../hooks/useWeather'
+import { getFallbackImageUrl } from '../lib/unsplash.js'
+import { getItineraryPrompt } from '../prompts/itineraryPrompt'
+import ItineraryView from '../components/ItineraryView/ItineraryView.jsx'
+import ChatFollowUp from '../components/ChatFollowUp/ChatFollowUp.jsx'
+import Badge from '../components/UI/Badge.jsx'
+import Button from '../components/UI/Button.jsx'
+import ImageSkeleton from '../components/Skeleton/ImageSkeleton.jsx'
 import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning } from 'lucide-react'
 
 const WeatherIcons = { Sun, Cloud, CloudRain, CloudSnow, CloudLightning }
@@ -44,11 +44,11 @@ export default function ItineraryPage() {
 
   const generateItinerary = async () => {
     if (!destinationName || !vibe) return
-    
+
     setLoading(true)
     setError(null)
     setStreamedText('')
-    
+
     try {
       let accumulated = ''
       await streamItinerary(destinationName, vibe, (chunk) => {
@@ -68,6 +68,13 @@ export default function ItineraryPage() {
     generateItinerary()
   }, []) // Only on mount
 
+  // Safety net: never let the hero image block the overlay for more than 6 s
+  useEffect(() => {
+    if (imageLoaded) return
+    const id = setTimeout(() => setImageLoaded(true), 6000)
+    return () => clearTimeout(id)
+  }, [imageLoaded])
+
   if (!destinationName) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
@@ -86,6 +93,71 @@ export default function ItineraryPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] pb-32">
+
+      {/* ── Full-screen loading overlay (holds until text AND hero image are ready) ── */}
+      <AnimatePresence>
+        {(loading || !imageLoaded) && (
+          <motion.div
+            key="itinerary-overlay"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.65, ease: 'easeInOut' } }}
+            style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#09090f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '28px' }}
+          >
+            <div style={{ position: 'relative', width: '160px', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <motion.div
+                animate={{ scale: [1, 1.22, 1], opacity: [0.2, 0.38, 0.2] }}
+                transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ position: 'absolute', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(212,168,75,0.38) 0%, transparent 70%)', filter: 'blur(18px)' }}
+              />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
+                style={{ position: 'absolute', width: '144px', height: '144px', borderRadius: '50%', border: '1px dashed rgba(212,168,75,0.22)' }}
+              />
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
+                style={{ position: 'absolute', width: '112px', height: '112px', borderRadius: '50%', border: '1.5px solid transparent', borderTopColor: 'rgba(212,168,75,0.55)', borderRightColor: 'rgba(212,168,75,0.18)' }}
+              />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+                style={{ position: 'absolute', width: '88px', height: '88px', borderRadius: '50%', border: '1.5px solid transparent', borderTopColor: 'rgba(212,168,75,0.7)', borderLeftColor: 'rgba(212,168,75,0.25)' }}
+              />
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 5, repeat: Infinity, ease: 'linear' }} style={{ position: 'absolute', width: '88px', height: '88px' }}>
+                <div style={{ position: 'absolute', top: '-4px', left: '50%', transform: 'translateX(-50%)', width: '7px', height: '7px', borderRadius: '50%', background: '#d4a84b', boxShadow: '0 0 8px rgba(212,168,75,0.9), 0 0 16px rgba(212,168,75,0.5)' }} />
+              </motion.div>
+              <motion.div animate={{ rotate: -360 }} transition={{ duration: 9, repeat: Infinity, ease: 'linear' }} style={{ position: 'absolute', width: '112px', height: '112px' }}>
+                <div style={{ position: 'absolute', bottom: '-3px', left: '50%', transform: 'translateX(-50%)', width: '5px', height: '5px', borderRadius: '50%', background: 'rgba(212,168,75,0.7)', boxShadow: '0 0 6px rgba(212,168,75,0.7)' }} />
+              </motion.div>
+              <motion.div
+                animate={{ scale: [1, 1.06, 1] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ position: 'relative', width: '68px', height: '68px', borderRadius: '50%', background: 'radial-gradient(circle at 35% 35%, rgba(212,168,75,0.18), rgba(212,168,75,0.06))', border: '1px solid rgba(212,168,75,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 32px rgba(212,168,75,0.25), inset 0 1px 0 rgba(255,255,255,0.08)' }}
+              >
+                <motion.div animate={{ rotate: [0, 15, -10, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}>
+                  <Sparkles style={{ width: '28px', height: '28px', color: '#d4a84b', filter: 'drop-shadow(0 0 6px rgba(212,168,75,0.8))' }} />
+                </motion.div>
+              </motion.div>
+            </div>
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <motion.p
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: 'clamp(18px, 2.5vw, 22px)', color: '#ffffff', letterSpacing: '-0.3px', margin: 0 }}
+              >
+                Crafting your bespoke itinerary…
+              </motion.p>
+              {destinationName && (
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'rgba(212,168,75,0.65)', letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0 }}>
+                  {destinationName}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Sticky top navigation ── */}
       <motion.nav
         initial={{ y: -60 }}
@@ -148,15 +220,16 @@ export default function ItineraryPage() {
         {/* Hero content */}
         <motion.div
           style={{ opacity: heroOpacity }}
-          className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 max-w-[var(--content-max)] mx-auto"
+          className="absolute inset-0 flex flex-col justify-end items-center p-6 md:p-10 max-w-[var(--content-max)] mx-auto"
         >
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, type: 'spring', stiffness: 200 }}
+            className="flex flex-col items-center text-center w-full"
           >
             {destinationData?.countryCode && (
-              <div className="flex items-center gap-2.5 mb-4">
+              <div className="flex items-center justify-center gap-2.5 mb-4">
                 <img
                   src={`https://flagcdn.com/w40/${destinationData.countryCode.toLowerCase()}.png`}
                   alt={destinationData.country}
@@ -168,11 +241,11 @@ export default function ItineraryPage() {
               </div>
             )}
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-5 leading-[1.05] tracking-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-5 leading-[1.05] tracking-tight text-center">
               {destinationName}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               {destinationData?.bestFor && (
                 <Badge>
                   <Clock className="w-3 h-3 mr-1.5" />
@@ -193,8 +266,87 @@ export default function ItineraryPage() {
         </motion.div>
       </div>
 
-      {/* ── Full-width itinerary content ── */}
+      {/* ── Destination map — full-width gold-bordered card ── */}
       <div className="max-w-[var(--content-max)] mx-auto px-6 pt-12">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
+        >
+          <div
+            className="relative overflow-hidden"
+            style={{
+              borderRadius: '1.5rem',
+              border: '1px solid rgba(212, 168, 75, 0.5)',
+              background: 'rgba(10, 15, 30, 0.72)',
+              boxShadow: '0 30px 60px rgba(0,0,0,0.5), 0 0 50px rgba(212, 168, 75, 0.12), inset 0 1px 0 rgba(255,255,255,0.04)',
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-6 py-4"
+              style={{
+                borderBottom: '1px solid rgba(212,168,75,0.22)',
+                background: 'linear-gradient(180deg, rgba(10,15,30,0.8) 0%, rgba(10,15,30,0.55) 100%)',
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+              }}
+            >
+              <div className="flex items-center gap-2.5">
+                <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
+                <span className="font-[var(--font-heading)] font-semibold text-[11px] text-white uppercase tracking-[0.28em]">
+                  Explore {destinationName}
+                </span>
+              </div>
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" style={{ boxShadow: '0 0 8px var(--color-accent)' }} />
+                <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">Live Map</span>
+              </div>
+            </div>
+            <iframe
+              title={`Map of ${destinationName}`}
+              width="100%"
+              height="400"
+              style={{ border: 0, display: 'block', marginTop: '16px' }}
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(destinationName)}&t=&z=11&ie=UTF8&iwloc=&output=embed`}
+            />
+          </div>
+
+          {/* View Full Map — fallback button */}
+          <div className="mt-4 flex justify-end">
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationName)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-[var(--font-body)] text-sm font-medium text-white/70 hover:text-white transition-all"
+              style={{
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.02)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(212,168,75,0.45)'
+                e.currentTarget.style.background = 'rgba(212,168,75,0.06)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
+              }}
+            >
+              View Full Map
+              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </a>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ── Full-width itinerary content — fades in once overlay lifts ── */}
+      <motion.div
+        animate={{ opacity: (loading || !imageLoaded) ? 0 : 1 }}
+        transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+        className="max-w-[var(--content-max)] mx-auto px-6 pt-12"
+      >
 
         {/* Section header */}
         <div className="flex items-end justify-between mb-10 pb-6 border-b border-white/[0.06]">
@@ -215,7 +367,7 @@ export default function ItineraryPage() {
               Your Itinerary
             </h2>
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -235,72 +387,52 @@ export default function ItineraryPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-12">
           {/* Main itinerary — fills available width */}
           <div>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-12 glass-card mb-8"
-              >
-                <p className="text-red-400 mb-4 font-[var(--font-body)] text-sm">{error}</p>
-                <Button onClick={generateItinerary}>
-                  Try Again
-                </Button>
-              </motion.div>
-            )}
+            <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12 glass-card mb-8"
+                >
+                  <p className="text-red-400 mb-4 font-[var(--font-body)] text-sm">{error}</p>
+                  <Button onClick={generateItinerary}>
+                    Try Again
+                  </Button>
+                </motion.div>
+              )}
 
-            <ItineraryView streamedText={streamedText} loading={loading} />
+              <ItineraryView streamedText={streamedText} loading={loading} />
+            </div>
           </div>
 
-          {/* Sidebar — map + quick info */}
-          <div className="hidden lg:block">
+          {/* Sidebar — quick info */}
+          <div className="hidden lg:block min-w-0">
             <div className="sticky top-20 space-y-6">
-              {/* Map card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-                className="glass-card overflow-hidden"
-              >
-                <div className="px-5 py-4 border-b border-white/5 flex items-center gap-2.5">
-                  <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
-                  <span className="font-[var(--font-heading)] font-semibold text-sm text-white">Destination Map</span>
-                </div>
-                <iframe
-                  title="Google Map"
-                  width="100%"
-                  height="280"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(destinationName)}&t=&z=11&ie=UTF8&iwloc=&output=embed`}
-                />
-              </motion.div>
-
               {/* Quick info card */}
               {destinationData && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
-                  className="glass-card p-5"
+                  className="glass-card min-w-0"
+                  style={{ padding: '20px 24px' }}
                 >
                   <h3 className="font-[var(--font-heading)] font-semibold text-sm text-white mb-4">Quick Info</h3>
-                  <div className="space-y-3">
+                  <div className="space-y-3 min-w-0">
                     {destinationData.reason && (
-                      <p className="text-sm text-[var(--color-text-muted)] leading-relaxed font-[var(--font-body)]">
+                      <p className="text-sm text-[var(--color-text-muted)] leading-relaxed font-[var(--font-body)] break-words">
                         {destinationData.reason}
                       </p>
                     )}
                     {destinationData.priceRange && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-[var(--color-text-muted)] font-[var(--font-body)]">Starting from</span>
+                      <div className="flex items-center justify-between gap-3 text-sm min-w-0">
+                        <span className="text-[var(--color-text-muted)] font-[var(--font-body)] shrink-0">Starting from</span>
                         <span className="font-[var(--font-heading)] font-bold text-[var(--color-accent)]">{destinationData.priceRange}</span>
                       </div>
                     )}
                     {destinationData.sustainabilityScore && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-[var(--color-text-muted)] font-[var(--font-body)]">Eco Rating</span>
+                      <div className="flex items-center justify-between gap-3 text-sm min-w-0">
+                        <span className="text-[var(--color-text-muted)] font-[var(--font-body)] shrink-0">Eco Rating</span>
                         <span className="font-[var(--font-body)] font-semibold text-emerald-400">{destinationData.sustainabilityScore}/10</span>
                       </div>
                     )}
@@ -310,7 +442,7 @@ export default function ItineraryPage() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Chat follow-up */}
       {fullText && (

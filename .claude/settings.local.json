@@ -15,7 +15,13 @@
       "Bash(cmd *)",
       "Bash(where python *)",
       "Bash(C:/Users/marvi/AppData/Local/Microsoft/WindowsApps/python.exe *)",
-      "Bash(dir /b /s \"C:\\\\Users\\\\marvi\\\\OneDrive\\\\Documents\\\\MDX\\\\LLM\\\\HACKATHON\\\\.claude\\\\skills\\\\ui-ux-pro-max\")"
+      "Bash(dir /b /s \"C:\\\\Users\\\\marvi\\\\OneDrive\\\\Documents\\\\MDX\\\\LLM\\\\HACKATHON\\\\.claude\\\\skills\\\\ui-ux-pro-max\")",
+      "Bash(node -e \"import\\('./src/App.jsx'\\)\")",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(node -e \"require\\('./node_modules/@radix-ui/react-dialog/package.json'\\)\")",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(npx vite *)",
+      "Bash(npm install *)"
     ]
   }
 }

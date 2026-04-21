@@ -1,6 +1,6 @@
 // source_handbook: week11-hackathon-preparation
 import { useState, useEffect } from 'react'
-import { fetchDestinationImage, getFallbackImageUrl } from '@/lib/unsplash'
+import { fetchDestinationImage, getFallbackImageUrl } from '../lib/unsplash.js'
 
 /**
  * Custom hook for fetching destination images with Unsplash + Pollinations fallback.

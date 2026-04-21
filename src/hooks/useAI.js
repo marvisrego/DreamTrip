@@ -1,13 +1,12 @@
-// source_handbook: week11-hackathon-preparation
 import { useState, useCallback, useRef } from 'react'
-import { callGroqStream } from '@/lib/groq'
+import { callGroqStream } from '../lib/groq.js'
 
 /**
- * Custom hook for Groq streaming chat.
+ * Custom hook for GitHub Models streaming chat.
  * Provides progressive text rendering and conversation history.
- * @returns {{ streamedText, fullText, loading, error, startStream, messages, addUserMessage, resetChat }}
+ * @returns {{ streamedText, fullText, loading, error, startStream, stopStream, messages, addUserMessage, resetChat }}
  */
-export function useGroq() {
+export function useAI() {
   const [streamedText, setStreamedText] = useState('')
   const [fullText, setFullText] = useState('')
   const [loading, setLoading] = useState(false)
@@ -20,11 +19,9 @@ export function useGroq() {
     setError(null)
     setStreamedText('')
 
-    // Add user message to history
     const newMessages = [...messages, { role: 'user', content: userMessage }]
     setMessages(newMessages)
 
-    // Create abort controller for cancellation
     abortRef.current = new AbortController()
 
     try {
@@ -38,7 +35,6 @@ export function useGroq() {
       )
 
       setFullText(result)
-      // Add assistant response to history
       setMessages(prev => [...prev, { role: 'assistant', content: result }])
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -59,15 +55,11 @@ export function useGroq() {
     setStreamedText('')
     setFullText('')
     setError(null)
-    if (abortRef.current) {
-      abortRef.current.abort()
-    }
+    if (abortRef.current) abortRef.current.abort()
   }, [])
 
   const stopStream = useCallback(() => {
-    if (abortRef.current) {
-      abortRef.current.abort()
-    }
+    if (abortRef.current) abortRef.current.abort()
   }, [])
 
   return {

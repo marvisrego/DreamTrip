@@ -2,7 +2,7 @@
 import { useMemo, useRef } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import DayCard from './DayCard'
-import Loader from '@/components/UI/Loader'
+import Loader from '../UI/Loader.jsx'
 
 function parseDays(text) {
   if (!text) return []

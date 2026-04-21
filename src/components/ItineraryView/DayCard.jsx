@@ -167,6 +167,9 @@ export default function DayCard({ dayText, dayNumber }) {
                 marginBottom: '24px',
                 lineHeight: 1.25,
                 letterSpacing: '-0.3px',
+                overflowWrap: 'break-word',
+                wordBreak: 'break-word',
+                minWidth: 0,
               }}
             >
               {title}
@@ -232,7 +235,7 @@ export default function DayCard({ dayText, dayNumber }) {
                     <Icon style={{ width: '15px', height: '15px', color }} />
                   </div>
 
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                     {/* Small-caps label */}
                     <p
                       style={{
@@ -248,18 +251,26 @@ export default function DayCard({ dayText, dayNumber }) {
                     >
                       {label}
                     </p>
-                    {/* Body text — high-readability sans-serif */}
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '14px',
-                        color: 'rgba(255,255,255,0.88)',
-                        lineHeight: 1.75,
-                        margin: 0,
-                      }}
-                    >
-                      {content}
-                    </p>
+                    {/* Body text — fades out gracefully at bottom when very long */}
+                    <div style={{ position: 'relative' }}>
+                      <p
+                        style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '14px',
+                          color: 'rgba(255,255,255,0.88)',
+                          lineHeight: 1.75,
+                          margin: 0,
+                          overflowWrap: 'break-word',
+                          wordBreak: 'break-word',
+                          overflow: 'hidden',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 8,
+                          WebkitBoxOrient: 'vertical',
+                        }}
+                      >
+                        {content}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </motion.div>

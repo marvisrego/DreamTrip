@@ -1,5 +1,4 @@
-// source_handbook: week11-hackathon-preparation
-// Groq system prompt for day-by-day itinerary generation
+// System prompt for day-by-day itinerary generation (Groq / Llama 3.3 70B)
 
 /**
  * Build the itinerary system prompt.
@@ -8,8 +7,9 @@
  * @param {string} duration - Suggested duration (e.g. "7–10 days")
  * @returns {string}
  */
-export function getItineraryPrompt(destination, vibe, duration) {
-  return `You are a professional travel planner writing for a premium travel magazine. Create a detailed day-by-day itinerary for the given destination.
+export function getItineraryPrompt(destination, vibe, duration, context = '') {
+  const contextBlock = context ? `<context>${context}</context>\n\n` : ''
+  return `${contextBlock}You are a professional travel planner writing for a premium travel magazine. Create a detailed day-by-day itinerary for the given destination.
 
 Structure each day EXACTLY as follows:
 
