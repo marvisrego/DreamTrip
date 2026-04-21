@@ -1,25 +1,25 @@
-// Groq API wrapper — Llama 3.3 via OpenAI SDK
-// Base URL: https://api.groq.com/openai/v1
+// GitHub Models API wrapper — GPT-4o mini via OpenAI-compatible SDK
+// Base URL: https://models.inference.ai.azure.com
 
 import OpenAI from 'openai'
 
-const GROQ_BASE_URL = 'https://api.groq.com/openai/v1'
-const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
+const GITHUB_MODELS_BASE_URL = 'https://models.inference.ai.azure.com'
+const DEFAULT_MODEL = 'gpt-4o-mini'
 
 const getClient = () => {
-  const apiKey = import.meta.env.VITE_GROQ_API
+  const apiKey = import.meta.env.VITE_GITHUB_TOKEN
   if (!apiKey) {
-    throw new Error('VITE_GROQ_API is not set in environment variables')
+    throw new Error('VITE_GITHUB_TOKEN is not set in environment variables')
   }
   return new OpenAI({
-    baseURL: GROQ_BASE_URL,
+    baseURL: GITHUB_MODELS_BASE_URL,
     apiKey,
     dangerouslyAllowBrowser: true,
   })
 }
 
 /**
- * Call Groq API with streaming support.
+ * Call GitHub Models API with streaming support.
  */
 export async function callGroqStream(messages, systemPrompt, onChunk, signal) {
   const client = getClient()
@@ -48,7 +48,7 @@ export async function callGroqStream(messages, systemPrompt, onChunk, signal) {
 }
 
 /**
- * Call Groq API without streaming.
+ * Call GitHub Models API without streaming.
  */
 export async function callGroq(messages, systemPrompt) {
   const client = getClient()

@@ -1,4 +1,4 @@
-// All frontend AI calls — Groq API (Llama 3.3 70B Versatile)
+// All frontend AI calls — GitHub Models API (GPT-4o mini)
 
 import { callGroq, callGroqStream } from './groq.js'
 import { getDestinationPrompt, buildDestinationMessage } from '../prompts/destinationPrompt'

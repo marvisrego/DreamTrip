@@ -1,4 +1,4 @@
-// System prompt for day-by-day itinerary generation (Groq / Llama 3.3 70B)
+// System prompt for day-by-day itinerary generation (GPT-4o mini)
 
 /**
  * Build the itinerary system prompt.

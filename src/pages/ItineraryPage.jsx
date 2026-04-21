@@ -215,18 +215,18 @@ export default function ItineraryPage() {
 
         {/* Cinematic gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)] via-black/30 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25" />
 
         {/* Hero content */}
         <motion.div
           style={{ opacity: heroOpacity }}
-          className="absolute inset-0 flex flex-col justify-end items-center p-6 md:p-10 max-w-[var(--content-max)] mx-auto"
+          className="absolute inset-0 flex items-end justify-center px-6 md:px-10 pb-10 md:pb-14"
         >
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, type: 'spring', stiffness: 200 }}
-            className="flex flex-col items-center text-center w-full"
+            className="flex flex-col items-center justify-center text-center w-full max-w-[900px] mx-auto"
           >
             {destinationData?.countryCode && (
               <div className="flex items-center justify-center gap-2.5 mb-4">
@@ -241,7 +241,10 @@ export default function ItineraryPage() {
               </div>
             )}
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-5 leading-[1.05] tracking-tight text-center">
+            <h1
+              className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-5 leading-[1.05] tracking-tight text-center"
+              style={{ textShadow: '0 10px 30px rgba(0,0,0,0.42)' }}
+            >
               {destinationName}
             </h1>
 
@@ -267,7 +270,7 @@ export default function ItineraryPage() {
       </div>
 
       {/* ── Destination map — full-width gold-bordered card ── */}
-      <div className="max-w-[var(--content-max)] mx-auto px-6 pt-12">
+      <div className="w-[90%] max-w-[1200px] mx-auto pt-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -279,11 +282,11 @@ export default function ItineraryPage() {
               borderRadius: '1.5rem',
               border: '1px solid rgba(212, 168, 75, 0.5)',
               background: 'rgba(10, 15, 30, 0.72)',
-              boxShadow: '0 30px 60px rgba(0,0,0,0.5), 0 0 50px rgba(212, 168, 75, 0.12), inset 0 1px 0 rgba(255,255,255,0.04)',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5), 0 0 50px rgba(212, 168, 75, 0.12), inset 0 1px 0 rgba(255,255,255,0.04)',
             }}
           >
             <div
-              className="flex items-center justify-between px-6 py-4"
+              className="flex items-center justify-center px-6 py-4 text-center"
               style={{
                 borderBottom: '1px solid rgba(212,168,75,0.22)',
                 background: 'linear-gradient(180deg, rgba(10,15,30,0.8) 0%, rgba(10,15,30,0.55) 100%)',
@@ -291,22 +294,18 @@ export default function ItineraryPage() {
                 WebkitBackdropFilter: 'blur(14px)',
               }}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center gap-2.5">
                 <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
                 <span className="font-[var(--font-heading)] font-semibold text-[11px] text-white uppercase tracking-[0.28em]">
-                  Explore {destinationName}
+                  Explore The {destinationName}
                 </span>
-              </div>
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" style={{ boxShadow: '0 0 8px var(--color-accent)' }} />
-                <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">Live Map</span>
               </div>
             </div>
             <iframe
               title={`Map of ${destinationName}`}
               width="100%"
               height="400"
-              style={{ border: 0, display: 'block', marginTop: '16px' }}
+              style={{ border: 0, display: 'block' }}
               loading="lazy"
               allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
@@ -315,7 +314,7 @@ export default function ItineraryPage() {
           </div>
 
           {/* View Full Map — fallback button */}
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex justify-center">
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationName)}`}
               target="_blank"
@@ -345,7 +344,7 @@ export default function ItineraryPage() {
       <motion.div
         animate={{ opacity: (loading || !imageLoaded) ? 0 : 1 }}
         transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
-        className="max-w-[var(--content-max)] mx-auto px-6 pt-12"
+        className="max-w-[1400px] mx-auto px-6 pt-12"
       >
 
         {/* Section header */}
@@ -383,26 +382,23 @@ export default function ItineraryPage() {
           </motion.div>
         </div>
 
-        {/* Two-column layout: itinerary + map side by side on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-12">
+        {/* Two-column layout: 2fr itinerary + 1fr sticky sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10">
           {/* Main itinerary — fills available width */}
           <div>
-            <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center py-12 glass-card mb-8"
-                >
-                  <p className="text-red-400 mb-4 font-[var(--font-body)] text-sm">{error}</p>
-                  <Button onClick={generateItinerary}>
-                    Try Again
-                  </Button>
-                </motion.div>
-              )}
-
-              <ItineraryView streamedText={streamedText} loading={loading} />
-            </div>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-12 glass-card mb-8"
+              >
+                <p className="text-red-400 mb-4 font-[var(--font-body)] text-sm">{error}</p>
+                <Button onClick={generateItinerary}>
+                  Try Again
+                </Button>
+              </motion.div>
+            )}
+            <ItineraryView streamedText={streamedText} loading={loading} />
           </div>
 
           {/* Sidebar — quick info */}
@@ -414,10 +410,33 @@ export default function ItineraryPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
-                  className="glass-card min-w-0"
-                  style={{ padding: '20px 24px' }}
+                  className="min-w-0"
+                  style={{
+                    padding: '24px',
+                    borderRadius: 'var(--radius-card)',
+                    background: 'rgba(10,15,30,0.72)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(212,168,75,0.35)',
+                    boxShadow: '0 0 40px rgba(212,168,75,0.08), 0 16px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(212,168,75,0.06)',
+                  }}
                 >
-                  <h3 className="font-[var(--font-heading)] font-semibold text-sm text-white mb-4">Quick Info</h3>
+                  <div className="flex items-center gap-2 mb-5">
+                    <div style={{
+                      width: '6px', height: '6px', borderRadius: '50%',
+                      background: 'var(--color-accent)',
+                      boxShadow: '0 0 8px rgba(212,168,75,0.7)',
+                    }} />
+                    <h3 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 600,
+                      fontSize: '11px',
+                      color: 'var(--color-accent)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.22em',
+                      margin: 0,
+                    }}>Quick Info</h3>
+                  </div>
                   <div className="space-y-3 min-w-0">
                     {destinationData.reason && (
                       <p className="text-sm text-[var(--color-text-muted)] leading-relaxed font-[var(--font-body)] break-words">
