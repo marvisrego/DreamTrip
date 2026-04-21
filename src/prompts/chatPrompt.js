@@ -1,5 +1,4 @@
-// source_handbook: week11-hackathon-preparation
-// Groq system prompt for follow-up chat refinement
+// System prompt for follow-up chat refinement (Groq / Llama 3.3 70B)
 
 /**
  * Build the chat system prompt with full context.

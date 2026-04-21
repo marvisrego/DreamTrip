@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles } from 'lucide-react'
-import Button from '@/components/UI/Button'
+import Button from '../UI/Button.jsx'
 
 export default function VibeInput({ onSubmit, loading = false }) {
   const [vibe, setVibe] = useState('')

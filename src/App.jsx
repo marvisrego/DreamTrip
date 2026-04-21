@@ -1,8 +1,8 @@
 // source_handbook: week11-hackathon-preparation
 import { Routes, Route } from 'react-router-dom'
-import LandingPage from '@/pages/LandingPage'
-import ResultsPage from '@/pages/ResultsPage'
-import ItineraryPage from '@/pages/ItineraryPage'
+import LandingPage from './pages/LandingPage.jsx'
+import ResultsPage from './pages/ResultsPage.jsx'
+import ItineraryPage from './pages/ItineraryPage.jsx'
 
 export default function App() {
   return (

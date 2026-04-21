@@ -1,113 +1,63 @@
-// source_handbook: week11-hackathon-preparation
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import DestinationCard from './DestinationCard'
-import CardSkeleton from '@/components/Skeleton/CardSkeleton'
 
 const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
-  },
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
 }
 
-// Bento layout:
-//   Row 1 (lg:grid-cols-3): [Featured col-span-2] [Regular]
-//   Row 2+:                  [Regular] [Regular] [Regular]
-//   Last row (full-width):   [Banner col-span-3]
-// Total = 1 featured + N regular + 1 banner
+export default function DestinationGrid({ destinations, loading, onSelect, onAllImagesReady }) {
+  const [imagesReady, setImagesReady] = useState(0)
+  const [timedOut, setTimedOut] = useState(false)
 
-export default function DestinationGrid({ destinations, loading, onSelect }) {
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 w-full max-w-[1800px] mx-auto">
-        {/* Simulate the bento skeleton */}
-        <div className="min-h-[460px]">
-          <CardSkeleton tall />
-        </div>
-        <div>
-          <CardSkeleton />
-        </div>
-        <div>
-          <CardSkeleton />
-        </div>
-        <div>
-          <CardSkeleton />
-        </div>
-        <div className="col-span-full">
-          <CardSkeleton wide />
-        </div>
-      </div>
-    )
-  }
+  useEffect(() => {
+    setImagesReady(0)
+    setTimedOut(false)
+  }, [destinations])
 
-  if (!destinations || destinations.length === 0) return null
+  // Safety net: fire ready after 6 s even if an image never fires load/error
+  useEffect(() => {
+    if (!destinations?.length || loading) return
+    const id = setTimeout(() => setTimedOut(true), 6000)
+    return () => clearTimeout(id)
+  }, [destinations, loading])
 
-  const featured  = destinations[0]                                      // index 0 → featured
-  const regular   = destinations.slice(1, destinations.length - 1)       // indices 1..n-2
-  const banner    = destinations.length > 2 ? destinations[destinations.length - 1] : null  // last index → banner (only if 3+)
+  const handleImageReady = useCallback(() => setImagesReady((n) => n + 1), [])
 
-  // If only 2 destinations, show featured + one regular
-  if (destinations.length === 2) {
-    return (
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 w-full max-w-[1800px] mx-auto"
-      >
-        <div key={featured.destination}>
-          <DestinationCard destination={featured} index={0} variant="featured" onSelect={onSelect} />
-        </div>
-        <div>
-          <DestinationCard key={destinations[1].destination} destination={destinations[1]} index={1} variant="regular" onSelect={onSelect} />
-        </div>
-      </motion.div>
-    )
-  }
+  const hasDestinations = destinations && destinations.length > 0
+  const allImagesLoaded = hasDestinations && (imagesReady >= destinations.length || timedOut)
 
+  useEffect(() => {
+    if (allImagesLoaded) onAllImagesReady?.()
+  }, [allImagesLoaded, onAllImagesReady])
+
+  // Cards always rendered (even while invisible) so hooks & image fetches run.
+  // Parent's sparkle overlay covers everything — no skeleton here.
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 w-full max-w-[1800px] mx-auto"
+    <div
+      style={!allImagesLoaded
+        ? { position: 'absolute', top: 0, left: 0, right: 0, opacity: 0, pointerEvents: 'none' }
+        : {}}
     >
-      <AnimatePresence>
-        {/* ── Featured card (2fr) ── */}
-        <div key={featured.destination}>
-          <DestinationCard
-            destination={featured}
-            index={0}
-            variant="featured"
-            onSelect={onSelect}
-          />
-        </div>
-
-        {/* ── Regular cards (1fr) ── */}
-        {regular.map((dest, i) => (
-          <div key={dest.destination}>
+      {hasDestinations && (
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={allImagesLoaded ? 'visible' : 'hidden'}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-[1800px] mx-auto"
+        >
+          {destinations.map((dest, i) => (
             <DestinationCard
+              key={dest.destination}
               destination={dest}
-              index={i + 1}
-              variant="regular"
+              index={i}
               onSelect={onSelect}
+              onImageReady={handleImageReady}
             />
-          </div>
-        ))}
-
-        {/* ── Banner card (full width 100%) ── */}
-        {banner && (
-          <div key={banner.destination} className="col-span-full">
-            <DestinationCard
-              destination={banner}
-              index={destinations.length - 1}
-              variant="banner"
-              onSelect={onSelect}
-            />
-          </div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </div>
   )
 }

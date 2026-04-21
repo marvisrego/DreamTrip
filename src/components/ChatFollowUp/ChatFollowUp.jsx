@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { X, Sparkles, Globe, BrainCog, ArrowUp } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { streamChat } from '@/lib/api'
+import { streamChat } from '../../lib/api.js'
 import ChatMessage from './ChatMessage'
 
 // ── Solid "Gemini-style" pill input ──────────────────────────────────────────

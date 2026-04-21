@@ -1,43 +1,31 @@
-// source_handbook: week11-hackathon-preparation
-// GitHub Models API wrapper — itinerary generation and chat
-// Uses gpt-4o-mini via OpenAI SDK
-// Base URL: https://models.inference.ai.azure.com
+// Groq API wrapper — Llama 3.3 via OpenAI SDK
+// Base URL: https://api.groq.com/openai/v1
 
 import OpenAI from 'openai'
 
-const GITHUB_MODELS_URL = 'https://models.inference.ai.azure.com'
-const DEFAULT_MODEL = 'gpt-4o-mini'
+const GROQ_BASE_URL = 'https://api.groq.com/openai/v1'
+const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
 
-/**
- * Initialize OpenAI client for GitHub Models
- */
 const getClient = () => {
-  const apiKey = import.meta.env.VITE_GITHUB_TOKEN
+  const apiKey = import.meta.env.VITE_GROQ_API
   if (!apiKey) {
-    throw new Error('VITE_GITHUB_TOKEN is not set in environment variables')
+    throw new Error('VITE_GROQ_API is not set in environment variables')
   }
-
   return new OpenAI({
-    baseURL: GITHUB_MODELS_URL,
-    apiKey: apiKey,
-    dangerouslyAllowBrowser: true // Required for Vite/frontend
+    baseURL: GROQ_BASE_URL,
+    apiKey,
+    dangerouslyAllowBrowser: true,
   })
 }
 
-
 /**
- * Call GitHub Models API with streaming support.
- * @param {Array<{role: string, content: string}>} messages - Conversation messages
- * @param {string} systemPrompt - System prompt for the model
- * @param {function} onChunk - Callback called with each text chunk as it arrives
- * @param {AbortSignal} [signal] - Optional abort signal to cancel the stream
- * @returns {Promise<string>} Full completed response text
+ * Call Groq API with streaming support.
  */
 export async function callGroqStream(messages, systemPrompt, onChunk, signal) {
   const client = getClient()
   const fullMessages = [
     { role: 'system', content: systemPrompt },
-    ...messages
+    ...messages,
   ]
 
   const stream = await client.chat.completions.create({
@@ -56,33 +44,22 @@ export async function callGroqStream(messages, systemPrompt, onChunk, signal) {
       onChunk(content, fullText)
     }
   }
-
   return fullText
 }
 
 /**
- * Call GitHub Models API without streaming (single response).
- * @param {Array<{role: string, content: string}>} messages - Conversation messages
- * @param {string} systemPrompt - System prompt
- * @returns {Promise<string>} Complete response text
+ * Call Groq API without streaming.
  */
 export async function callGroq(messages, systemPrompt) {
   const client = getClient()
-  
-  const requestPayload = {
+  const response = await client.chat.completions.create({
     model: DEFAULT_MODEL,
     messages: [
       { role: 'system', content: systemPrompt },
-      ...messages
+      ...messages,
     ],
     temperature: 0.7,
     max_tokens: 4096,
-  };
-  
-  console.log('Sending this request to GitHub Models API:', requestPayload);
-
-  const response = await client.chat.completions.create(requestPayload)
-
+  })
   return response.choices[0]?.message?.content || ''
 }
-
