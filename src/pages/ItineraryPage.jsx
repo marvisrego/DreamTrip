@@ -215,18 +215,18 @@ export default function ItineraryPage() {
 
         {/* Cinematic gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)] via-black/30 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25" />
 
         {/* Hero content */}
         <motion.div
           style={{ opacity: heroOpacity }}
-          className="absolute inset-0 flex flex-col justify-end items-center p-6 md:p-10 max-w-[var(--content-max)] mx-auto"
+          className="absolute inset-0 flex items-end justify-center px-6 md:px-10 pb-10 md:pb-14"
         >
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, type: 'spring', stiffness: 200 }}
-            className="flex flex-col items-center text-center w-full"
+            className="flex flex-col items-center justify-center text-center w-full max-w-[900px] mx-auto"
           >
             {destinationData?.countryCode && (
               <div className="flex items-center justify-center gap-2.5 mb-4">
@@ -241,7 +241,10 @@ export default function ItineraryPage() {
               </div>
             )}
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-5 leading-[1.05] tracking-tight text-center">
+            <h1
+              className="text-4xl md:text-6xl lg:text-7xl font-[var(--font-heading)] font-bold text-white mb-5 leading-[1.05] tracking-tight text-center"
+              style={{ textShadow: '0 10px 30px rgba(0,0,0,0.42)' }}
+            >
               {destinationName}
             </h1>
 
@@ -267,7 +270,7 @@ export default function ItineraryPage() {
       </div>
 
       {/* ── Destination map — full-width gold-bordered card ── */}
-      <div className="max-w-[var(--content-max)] mx-auto px-6 pt-12">
+      <div className="w-[90%] max-w-[1200px] mx-auto pt-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -279,11 +282,11 @@ export default function ItineraryPage() {
               borderRadius: '1.5rem',
               border: '1px solid rgba(212, 168, 75, 0.5)',
               background: 'rgba(10, 15, 30, 0.72)',
-              boxShadow: '0 30px 60px rgba(0,0,0,0.5), 0 0 50px rgba(212, 168, 75, 0.12), inset 0 1px 0 rgba(255,255,255,0.04)',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5), 0 0 50px rgba(212, 168, 75, 0.12), inset 0 1px 0 rgba(255,255,255,0.04)',
             }}
           >
             <div
-              className="flex items-center justify-between px-6 py-4"
+              className="flex items-center justify-center px-6 py-4 text-center"
               style={{
                 borderBottom: '1px solid rgba(212,168,75,0.22)',
                 background: 'linear-gradient(180deg, rgba(10,15,30,0.8) 0%, rgba(10,15,30,0.55) 100%)',
@@ -291,22 +294,18 @@ export default function ItineraryPage() {
                 WebkitBackdropFilter: 'blur(14px)',
               }}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center gap-2.5">
                 <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
                 <span className="font-[var(--font-heading)] font-semibold text-[11px] text-white uppercase tracking-[0.28em]">
-                  Explore {destinationName}
+                  Explore The {destinationName}
                 </span>
-              </div>
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" style={{ boxShadow: '0 0 8px var(--color-accent)' }} />
-                <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">Live Map</span>
               </div>
             </div>
             <iframe
               title={`Map of ${destinationName}`}
               width="100%"
               height="400"
-              style={{ border: 0, display: 'block', marginTop: '16px' }}
+              style={{ border: 0, display: 'block' }}
               loading="lazy"
               allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
@@ -315,7 +314,7 @@ export default function ItineraryPage() {
           </div>
 
           {/* View Full Map — fallback button */}
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex justify-center">
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationName)}`}
               target="_blank"

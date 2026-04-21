@@ -218,7 +218,7 @@ export default function ChatFollowUp({ destination, vibe, itinerary }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          className="fixed bottom-8 right-8 z-40 flex items-center gap-2.5 px-6 py-3.5 rounded-full font-[var(--font-heading)] font-bold text-base cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2.5 px-6 py-3.5 rounded-full font-[var(--font-heading)] font-bold text-base cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
           style={{
             background: 'linear-gradient(135deg, #d4a84b 0%, #ea580c 100%)',
             color: '#0a0c10',
