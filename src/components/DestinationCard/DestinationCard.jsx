@@ -4,8 +4,11 @@ import { useUnsplash } from '../../hooks/useUnsplash.js'
 import { getFallbackImageUrl } from '../../lib/unsplash.js'
 
 export default function DestinationCard({ destination, index = 0, isFeatured = false, onSelect }) {
-  const { imageUrl, credit, loading } = useUnsplash(destination.destination)
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const preparedImage = destination.imageUrl
+    ? { url: destination.imageUrl, credit: destination.imageCredit }
+    : null
+  const { imageUrl, credit, loading } = useUnsplash(destination.destination, preparedImage)
+  const [imageLoaded, setImageLoaded] = useState(Boolean(preparedImage))
 
   const handleImageError = (event) => {
     const fallback = getFallbackImageUrl(destination.destination)

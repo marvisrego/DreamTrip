@@ -1,61 +1,79 @@
-import OpenAI from 'openai'
+const NVIDIA_PROXY_URL = '/api/nvidia'
 
-const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1'
-const NVIDIA_MODEL = 'nvidia/nemotron-3-super-120b-a12b'
-
-function getClient() {
-  // Kept for compatibility with the existing deployment environment.
-  const apiKey = import.meta.env.VITE_GITHUB_TOKEN
-
-  if (!apiKey) {
-    throw new Error('VITE_GITHUB_TOKEN is not set in the environment')
+async function readError(response) {
+  try {
+    const payload = await response.json()
+    return [payload.error, payload.details].filter(Boolean).join(' ')
+  } catch {
+    return `The trip planner returned HTTP ${response.status}.`
   }
-
-  return new OpenAI({
-    baseURL: NVIDIA_BASE_URL,
-    apiKey,
-    dangerouslyAllowBrowser: true,
-  })
 }
 
-function completionOptions(messages, systemPrompt) {
-  return {
-    model: NVIDIA_MODEL,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      ...messages,
-    ],
-    temperature: 1,
-    top_p: 0.95,
-    max_tokens: 8192,
-    chat_template_kwargs: { enable_thinking: false },
+async function requestCompletion(messages, systemPrompt, stream, signal) {
+  const response = await fetch(NVIDIA_PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, systemPrompt, stream }),
+    signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(await readError(response))
+  }
+
+  return response
+}
+
+function parseStreamEvent(eventText, onContent) {
+  const data = eventText
+    .split('\n')
+    .filter((line) => line.startsWith('data:'))
+    .map((line) => line.slice(5).trim())
+    .join('')
+
+  if (!data || data === '[DONE]') return
+
+  try {
+    const payload = JSON.parse(data)
+    const content = payload.choices?.[0]?.delta?.content || ''
+    if (content) onContent(content)
+  } catch {
+    // A partial event remains buffered and is retried with the next chunk.
   }
 }
 
 export async function callModelStream(messages, systemPrompt, onChunk, signal) {
-  const client = getClient()
-  const stream = await client.chat.completions.create(
-    { ...completionOptions(messages, systemPrompt), stream: true },
-    { signal },
-  )
+  const response = await requestCompletion(messages, systemPrompt, true, signal)
+  if (!response.body) throw new Error('The NVIDIA response did not include a stream.')
 
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
   let fullText = ''
-  for await (const chunk of stream) {
-    const content = chunk.choices?.[0]?.delta?.content || ''
-    if (!content) continue
 
+  const handleContent = (content) => {
     fullText += content
     onChunk(content, fullText)
   }
+
+  while (true) {
+    const { value, done } = await reader.read()
+    if (done) break
+
+    buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n')
+    const events = buffer.split('\n\n')
+    buffer = events.pop() || ''
+    events.forEach((eventText) => parseStreamEvent(eventText, handleContent))
+  }
+
+  buffer += decoder.decode()
+  if (buffer.trim()) parseStreamEvent(buffer, handleContent)
 
   return fullText
 }
 
 export async function callModel(messages, systemPrompt) {
-  const client = getClient()
-  const response = await client.chat.completions.create(
-    completionOptions(messages, systemPrompt),
-  )
-
-  return response.choices?.[0]?.message?.content || ''
+  const response = await requestCompletion(messages, systemPrompt, false)
+  const payload = await response.json()
+  return payload.choices?.[0]?.message?.content || ''
 }

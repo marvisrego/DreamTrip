@@ -87,3 +87,48 @@ export async function fetchDestinationImage(destination) {
 export function getFallbackImageUrl(destination) {
   return getCuratedImage(destination)
 }
+
+function preloadImage(url, timeout = 12000) {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+    const timer = window.setTimeout(() => {
+      image.src = ''
+      reject(new Error('Image preload timed out'))
+    }, timeout)
+
+    image.onload = () => {
+      window.clearTimeout(timer)
+      resolve(url)
+    }
+    image.onerror = () => {
+      window.clearTimeout(timer)
+      reject(new Error('Image preload failed'))
+    }
+    image.src = url
+  })
+}
+
+/**
+ * Resolve and preload every destination image before the results page is shown.
+ */
+export async function prepareDestinationImages(destinations = []) {
+  return Promise.all(destinations.map(async (destination) => {
+    const fallbackUrl = getFallbackImageUrl(destination.destination)
+    let image = destination.imageUrl
+      ? { url: destination.imageUrl, credit: destination.imageCredit || 'Unsplash' }
+      : await fetchDestinationImage(destination.destination)
+
+    try {
+      await preloadImage(image.url)
+    } catch {
+      image = { url: fallbackUrl, credit: 'Unsplash' }
+      await preloadImage(fallbackUrl).catch(() => {})
+    }
+
+    return {
+      ...destination,
+      imageUrl: image.url,
+      imageCredit: image.credit,
+    }
+  }))
+}
