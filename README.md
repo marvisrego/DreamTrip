@@ -1,53 +1,86 @@
-# DreamTrip Technical Documentation
+# DreamTrip
 
-DreamTrip is an AI-powered travel orchestration platform that leverages Large Language Models (LLMs) and real-time Retrieval-Augmented Generation (RAG) to transform unstructured natural language prompts into actionable travel itineraries.
+DreamTrip turns a natural-language travel brief into ranked destination matches and a practical day-by-day itinerary. Users can describe a mood, budget, pace, or travel style instead of working through a long filter form.
 
-## Technical Architecture
+## AI model
 
-The system is built on a modular pipeline designed to minimize latency while maximizing the relevance of generated content.
+DreamTrip uses **NVIDIA Nemotron 3 Super 120B A12B** through NVIDIA’s hosted NIM API.
 
-### 1. Intent Parsing and Destination Discovery
-- LLM Provider: GPT-4o mini via GitHub Models.
-- Media Integration: Unsplash API for context-aware image retrieval.
-- Logic: The initial user prompt is processed to extract semantic travel preferences (e.g., mood, climate, activity density). The LLM returns a structured list of destinations which are then mapped to the Unsplash API for visual representation.
+- Base URL: `https://integrate.api.nvidia.com/v1`
+- Model ID: `nvidia/nemotron-3-super-120b-a12b`
+- Sampling: `temperature: 1`, `top_p: 0.95`
+- Thinking mode is disabled for predictable JSON and itinerary responses.
 
-### 2. Real-Time Data Grounding (RAG)
-- Search Engine: Tavily API.
-- Contextualization: Upon selecting a destination, the system triggers a targeted search via Tavily to bypass LLM knowledge cutoffs. This ensures the itinerary includes current venue statuses, local events, and up-to-date travel advisories.
-- Itinerary Generation: The retrieved context is injected into a system prompt for GPT-4o mini, which generates a structured, multi-day itinerary.
+The existing `VITE_GITHUB_TOKEN` environment-variable name is retained for deployment compatibility, but its value must now be an NVIDIA API key.
 
-### 3. State Management and Refinement Loop
-- Refinement: A secondary chatbot interface allows for iterative modifications to the generated state.
-- Geospatial Integration: Google Maps Platform is utilized for spatial grounding, allowing users to visualize itinerary locations via hover interactions.
+## What the app does
 
-## Deployment and Infrastructure
+- Converts a free-form travel brief into nine ranked destination matches.
+- Loads destination photography from Unsplash, with curated fallback images.
+- Adds current travel context through Tavily when a key is configured.
+- Streams a day-by-day itinerary as it is generated.
+- Lets users refine the completed itinerary through follow-up chat.
+- Shows live destination weather from Open-Meteo.
+- Uses the bundled home-page video as a muted, continuously looping background.
 
-To ensure a production-grade user experience and high availability, the application is deployed using a distributed architecture.
+## Stack
 
-### 1. Application Hosting
-- Platform: Vercel.
-- CI/CD: The repository is linked to Vercel for automated deployments. Every push to the main branch triggers a build process, ensuring continuous integration and delivery of the frontend and serverless functions.
+- React 19 and React Router
+- Vite 6
+- NVIDIA NIM and Nemotron 3 Super
+- Tavily Search
+- Unsplash
+- Open-Meteo
+- Lucide icons
 
-### 2. Asset Management and Optimization
-- Problem: High-definition background video assets exceed 100MB, which exceeds standard Git repository recommendations and would degrade performance if served directly from the application origin.
-- Storage: Amazon S3 (Simple Storage Service). Large media assets are decoupled from the source code and stored in an S3 bucket.
-- Delivery: Amazon CloudFront (CDN). To ensure low-latency delivery, CloudFront is used as a Content Delivery Network. This ensures assets are cached at edge locations globally, reducing the load on the origin and preventing buffering issues.
+## Local setup
 
-## API Implementation Details
+### 1. Install dependencies
 
-| Component | Service | Primary Function |
-| :--- | :--- | :--- |
-| Inference | GPT-4o mini | Semantic reasoning and text synthesis |
-| Search | Tavily | Real-time web-scale retrieval (RAG) |
-| Assets | Unsplash | Dynamic image sourcing |
-| Geospatial | Google Maps | Location visualization and validation |
-| Hosting | Vercel | Deployment and serverless orchestration |
-| Storage | Amazon S3 | Media asset storage |
-| CDN | Amazon CloudFront | Global asset delivery and caching |
+```bash
+npm install
+```
 
-## Design Patterns and Best Practices
+### 2. Configure environment variables
 
-- Modular Interface: Separation of concerns between the search retrieval layer and the synthesis layer.
-- Prompt Engineering: Structured system prompts are used to ensure the LLM output remains consistent and parsable for the UI components.
-- Latency Mitigation: Asynchronous API calls are implemented to ensure that UI animations remain fluid while data fetching occurs in the background.
-- Infrastructure Decoupling: Heavy assets are served via a dedicated CDN to prevent repository bloat and optimize the critical rendering path.
+Copy `.env.example` to `.env.local`, then replace the placeholders:
+
+```env
+VITE_GITHUB_TOKEN=your_nvidia_api_key
+VITE_UNSPLASH_ACCESS_KEY=your_unsplash_access_key
+VITE_TAVILY_API_KEY=your_tavily_api_key
+```
+
+Only the NVIDIA key is required for destination and itinerary generation. Unsplash and Tavily are optional; the app has image fallbacks and skips live search context when their keys are absent.
+
+Do not commit `.env.local`. Variables prefixed with `VITE_` are included in the browser bundle, so a production deployment should proxy NVIDIA requests through a server-side endpoint if the key must remain private.
+
+### 3. Start the app
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173`.
+
+## Production build
+
+```bash
+npm run build
+npm run preview
+```
+
+The compiled app is written to `dist/`.
+
+## Project structure
+
+```text
+src/
+  components/       Reusable destination, itinerary, chat, and UI components
+  hooks/            Image and weather hooks
+  lib/              NVIDIA, travel-context, and image integrations
+  pages/            Landing, results, and itinerary screens
+  prompts/          Destination, itinerary, and follow-up system prompts
+```
+
+The home-page video is stored as `7262-199224619_medium.mp4` at the project root and is bundled by Vite.

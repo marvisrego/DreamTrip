@@ -1,71 +1,64 @@
-// All frontend AI calls — GitHub Models API (GPT-4o mini)
-
-import { callGroq, callGroqStream } from './groq.js'
+import { callModel, callModelStream } from './nvidia.js'
 import { getDestinationPrompt, buildDestinationMessage } from '../prompts/destinationPrompt'
 import { getItineraryPrompt } from '../prompts/itineraryPrompt'
 import { getChatPrompt } from '../prompts/chatPrompt'
 
-// Fetch destination suggestions
 export async function fetchDestinations(vibe) {
-  const systemPrompt = getDestinationPrompt()
-  const userMessage = buildDestinationMessage(vibe)
-
-  const raw = await callGroq([{ role: 'user', content: userMessage }], systemPrompt)
+  const raw = await callModel(
+    [{ role: 'user', content: buildDestinationMessage(vibe) }],
+    getDestinationPrompt(),
+  )
   const clean = raw.replace(/```json|```/g, '').trim()
 
   try {
     const parsed = JSON.parse(clean)
     return Array.isArray(parsed) ? parsed : (parsed.destinations || [])
-  } catch (err) {
-    console.error('Failed to parse destinations JSON:', err, 'Raw:', raw)
-    throw new Error('Failed to parse destination suggestions')
+  } catch (error) {
+    console.error('Failed to parse destination suggestions:', error)
+    throw new Error('The destination response was not valid JSON')
   }
 }
 
 async function fetchTavilyContext(destination) {
+  const apiKey = import.meta.env.VITE_TAVILY_API_KEY
+  if (!apiKey) return ''
+
   try {
     const response = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        api_key: import.meta.env.VITE_TAVILY_API_KEY,
-        query: `${destination} travel guide tips food culture visa 2025`,
+        api_key: apiKey,
+        query: `${destination} travel guide tips food culture visa ${new Date().getFullYear()}`,
         max_results: 3,
         search_depth: 'basic',
       }),
     })
     if (!response.ok) return ''
+
     const data = await response.json()
-    return (data.results || []).map((r) => r.content).filter(Boolean).join('\n\n')
+    return (data.results || []).map((result) => result.content).filter(Boolean).join('\n\n')
   } catch {
     return ''
   }
 }
 
-// Stream itinerary — calls onChunk with each text piece as it arrives
 export async function streamItinerary(destination, vibe, onChunk) {
   const context = await fetchTavilyContext(destination)
   const systemPrompt = getItineraryPrompt(destination, vibe, '7–10 days', context)
-  const userMessage = `Please generate a detailed itinerary for ${destination} based on this vibe: ${vibe}`
+  const userMessage = `Create a detailed itinerary for ${destination} based on this travel brief: ${vibe}`
 
-  await callGroqStream(
+  return callModelStream(
     [{ role: 'user', content: userMessage }],
     systemPrompt,
-    (chunk) => onChunk(chunk),
+    onChunk,
   )
 }
 
-// Stream chat response
 export async function streamChat(message, history, destination, vibe, itinerary, onChunk) {
-  const systemPrompt = getChatPrompt(destination, vibe, itinerary)
-  const messages = [
-    ...history,
-    { role: 'user', content: message },
-  ]
-
-  await callGroqStream(
-    messages,
-    systemPrompt,
-    (chunk) => onChunk(chunk),
+  return callModelStream(
+    [...history, { role: 'user', content: message }],
+    getChatPrompt(destination, vibe, itinerary),
+    onChunk,
   )
 }
