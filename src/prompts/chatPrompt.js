@@ -1,4 +1,4 @@
-// System prompt for follow-up chat refinement (GPT-4o mini)
+// System prompt for follow-up chat refinement.
 
 /**
  * Build the chat system prompt with full context.

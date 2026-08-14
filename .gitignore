@@ -23,6 +23,7 @@ npm-debug.log*
 
 # Large media (hosted on CloudFront CDN)
 *.mp4
+!7262-199224619_medium.mp4
 
 # Scratch / debug
 scratch/

@@ -1,4 +1,4 @@
-// System prompt for day-by-day itinerary generation (GPT-4o mini)
+// System prompt for day-by-day itinerary generation.
 
 /**
  * Build the itinerary system prompt.
