@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Check, Compass, LoaderCircle, Map, Sparkles } from 'lucide-react'
 import AppHeader from '../components/UI/AppHeader.jsx'
+import GenerationLoader from '../components/UI/GenerationLoader.jsx'
 import { fetchDestinations } from '../lib/api.js'
+import { prepareDestinationImages } from '../lib/unsplash.js'
 import heroVideo from '../../7262-199224619_medium.mp4'
 
 const STARTERS = [
@@ -57,13 +59,18 @@ export default function LandingPage() {
 
     try {
       const destinations = await fetchDestinations(vibe)
-      navigate('/results', { state: { vibe, destinations } })
+      const preparedDestinations = await prepareDestinationImages(destinations)
+      navigate('/results', { state: { vibe, destinations: preparedDestinations } })
     } catch (requestError) {
       console.error(requestError)
-      setError('We could not create matches from that brief. Check the NVIDIA API key and try again.')
+      setError(requestError.message || 'We could not create matches from that brief. Try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  if (loading) {
+    return <GenerationLoader variant="destinations" />
   }
 
   return (

@@ -11,14 +11,14 @@ DreamTrip uses **NVIDIA Nemotron 3 Super 120B A12B** through NVIDIA’s hosted N
 - Sampling: `temperature: 1`, `top_p: 0.95`
 - Thinking mode is disabled for predictable JSON and itinerary responses.
 
-The existing `VITE_GITHUB_TOKEN` environment-variable name is retained for deployment compatibility, but its value must now be an NVIDIA API key.
+The browser calls a Vercel Function at `/api/nvidia`. The function reads `NVIDIA_API_KEY` at runtime and forwards requests to NVIDIA, so the key is not included in the browser bundle. The legacy `VITE_GITHUB_TOKEN` name is also accepted server-side during migration.
 
 ## What the app does
 
 - Converts a free-form travel brief into nine ranked destination matches.
 - Loads destination photography from Unsplash, with curated fallback images.
 - Adds current travel context through Tavily when a key is configured.
-- Streams a day-by-day itinerary as it is generated.
+- Builds the complete day-by-day itinerary behind a focused loading screen, then reveals it at once.
 - Lets users refine the completed itinerary through follow-up chat.
 - Shows live destination weather from Open-Meteo.
 - Uses the bundled home-page video as a muted, continuously looping background.
@@ -46,22 +46,26 @@ npm install
 Copy `.env.example` to `.env.local`, then replace the placeholders:
 
 ```env
-VITE_GITHUB_TOKEN=your_nvidia_api_key
+NVIDIA_API_KEY=your_nvidia_api_key
 VITE_UNSPLASH_ACCESS_KEY=your_unsplash_access_key
 VITE_TAVILY_API_KEY=your_tavily_api_key
 ```
 
 Only the NVIDIA key is required for destination and itinerary generation. Unsplash and Tavily are optional; the app has image fallbacks and skips live search context when their keys are absent.
 
-Do not commit `.env.local`. Variables prefixed with `VITE_` are included in the browser bundle, so a production deployment should proxy NVIDIA requests through a server-side endpoint if the key must remain private.
+Do not commit `.env.local`. On Vercel, add `NVIDIA_API_KEY` to the Production, Preview, and Development environments you use, then redeploy so the Function receives it.
 
 ### 3. Start the app
 
+For the complete app, including the local Vercel Function:
+
 ```bash
-npm run dev
+npx vercel dev
 ```
 
-Open `http://localhost:5173`.
+For frontend-only work, `npm run dev` still starts Vite, but AI requests require the Function route.
+
+Open the local URL printed by the Vercel CLI (typically `http://localhost:3000`).
 
 ## Production build
 
@@ -81,6 +85,8 @@ src/
   lib/              NVIDIA, travel-context, and image integrations
   pages/            Landing, results, and itinerary screens
   prompts/          Destination, itinerary, and follow-up system prompts
+api/
+  nvidia.js         Server-side NVIDIA proxy for Vercel
 ```
 
 The home-page video is stored as `7262-199224619_medium.mp4` at the project root and is bundled by Vite.

@@ -8,13 +8,20 @@ import { fetchDestinationImage, getFallbackImageUrl } from '../lib/unsplash.js'
  * @param {string} destination - Destination name to fetch image for
  * @returns {{ imageUrl, credit, loading }}
  */
-export function useUnsplash(destination) {
-  const [imageUrl, setImageUrl] = useState(null)
-  const [credit, setCredit] = useState(null)
-  const [loading, setLoading] = useState(true)
+export function useUnsplash(destination, preparedImage = null) {
+  const [imageUrl, setImageUrl] = useState(preparedImage?.url || null)
+  const [credit, setCredit] = useState(preparedImage?.credit || null)
+  const [loading, setLoading] = useState(!preparedImage?.url)
 
   useEffect(() => {
     if (!destination) {
+      setLoading(false)
+      return
+    }
+
+    if (preparedImage?.url) {
+      setImageUrl(preparedImage.url)
+      setCredit(preparedImage.credit || null)
       setLoading(false)
       return
     }
@@ -39,7 +46,7 @@ export function useUnsplash(destination) {
       })
 
     return () => { cancelled = true }
-  }, [destination])
+  }, [destination, preparedImage?.credit, preparedImage?.url])
 
   return { imageUrl, credit, loading }
 }

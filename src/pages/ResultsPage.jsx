@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { RefreshCw, SlidersHorizontal } from 'lucide-react'
 import AppHeader from '../components/UI/AppHeader.jsx'
 import Button from '../components/UI/Button.jsx'
+import GenerationLoader from '../components/UI/GenerationLoader.jsx'
 import DestinationGrid from '../components/DestinationCard/DestinationGrid.jsx'
 import { fetchDestinations } from '../lib/api.js'
+import { prepareDestinationImages } from '../lib/unsplash.js'
 
 const CACHE_PREFIX = 'dreamtrip:dest:'
 const LAST_VIBE_KEY = 'dreamtrip:lastVibe'
@@ -33,10 +35,16 @@ export default function ResultsPage() {
   const navigate = useNavigate()
   const vibe = location.state?.vibe || sessionStorage.getItem(LAST_VIBE_KEY) || ''
   const supplied = location.state?.destinations
-  const [destinations, setDestinations] = useState(() => (
+  const initialDestinations = (
     Array.isArray(supplied) && supplied.length ? supplied : readCache(vibe)
-  ))
-  const [loading, setLoading] = useState(!destinations.length && Boolean(vibe))
+  )
+  const [destinations, setDestinations] = useState(initialDestinations)
+  const [loading, setLoading] = useState(
+    Boolean(vibe) && (
+      !initialDestinations.length
+      || initialDestinations.some((destination) => !destination.imageUrl)
+    ),
+  )
   const [error, setError] = useState('')
 
   const loadDestinations = useCallback(async () => {
@@ -46,11 +54,12 @@ export default function ResultsPage() {
 
     try {
       const matches = await fetchDestinations(vibe)
-      setDestinations(matches)
-      writeCache(vibe, matches)
+      const preparedMatches = await prepareDestinationImages(matches)
+      setDestinations(preparedMatches)
+      writeCache(vibe, preparedMatches)
     } catch (requestError) {
       console.error(requestError)
-      setError('We could not refresh these matches. Check the NVIDIA API key, then try again.')
+      setError(requestError.message || 'We could not refresh these matches. Try again.')
     } finally {
       setLoading(false)
     }
@@ -59,8 +68,25 @@ export default function ResultsPage() {
   useEffect(() => {
     if (!vibe) return
     sessionStorage.setItem(LAST_VIBE_KEY, vibe)
-    if (Array.isArray(supplied) && supplied.length) writeCache(vibe, supplied)
-    if (!destinations.length) loadDestinations()
+    if (destinations.length && destinations.every((destination) => destination.imageUrl)) {
+      writeCache(vibe, destinations)
+      return
+    }
+    if (destinations.length) {
+      setLoading(true)
+      prepareDestinationImages(destinations)
+        .then((prepared) => {
+          setDestinations(prepared)
+          writeCache(vibe, prepared)
+        })
+        .catch((requestError) => {
+          console.error(requestError)
+          setError('We could not load every destination image. Try again.')
+        })
+        .finally(() => setLoading(false))
+      return
+    }
+    loadDestinations()
     // Initial hydration only; retry is handled explicitly.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -82,6 +108,10 @@ export default function ResultsPage() {
     )
   }
 
+  if (loading) {
+    return <GenerationLoader variant="destinations" />
+  }
+
   return (
     <div className="page page--results">
       <AppHeader onBack={() => navigate('/')} backLabel="Edit brief" />
@@ -96,12 +126,10 @@ export default function ResultsPage() {
         </section>
 
         <div className="results-toolbar">
-          <span>{loading ? 'Finding matches…' : `${destinations.length} places · ranked by fit`}</span>
-          {!loading && (
-            <button type="button" className="text-button" onClick={loadDestinations}>
-              <RefreshCw size={15} /> Refresh matches
-            </button>
-          )}
+          <span>{destinations.length} places · ranked by fit</span>
+          <button type="button" className="text-button" onClick={loadDestinations}>
+            <RefreshCw size={15} /> Refresh matches
+          </button>
         </div>
 
         {error && (
@@ -112,7 +140,7 @@ export default function ResultsPage() {
         )}
 
         {!error && (
-          <DestinationGrid destinations={destinations} loading={loading} onSelect={selectDestination} />
+          <DestinationGrid destinations={destinations} loading={false} onSelect={selectDestination} />
         )}
       </main>
     </div>

@@ -13,6 +13,7 @@ import {
 import AppHeader from '../components/UI/AppHeader.jsx'
 import Badge from '../components/UI/Badge.jsx'
 import Button from '../components/UI/Button.jsx'
+import GenerationLoader from '../components/UI/GenerationLoader.jsx'
 import ItineraryView from '../components/ItineraryView/ItineraryView.jsx'
 import ChatFollowUp from '../components/ChatFollowUp/ChatFollowUp.jsx'
 import { streamItinerary } from '../lib/api.js'
@@ -27,12 +28,15 @@ export default function ItineraryPage() {
   const destinationName = decodeURIComponent(encodedDestination || '')
   const destinationData = location.state?.destination || { destination: destinationName }
   const vibe = location.state?.vibe || sessionStorage.getItem('dreamtrip:lastVibe') || 'A balanced, locally focused trip'
-  const { imageUrl, credit, loading: imageLoading } = useUnsplash(destinationName)
+  const preparedHeroImage = destinationData.imageUrl
+    ? { url: destinationData.imageUrl, credit: destinationData.imageCredit }
+    : null
+  const { imageUrl, credit, loading: imageLoading } = useUnsplash(destinationName, preparedHeroImage)
   const { weather, conditionText } = useWeather(destinationName)
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(Boolean(preparedHeroImage))
   const [streamedText, setStreamedText] = useState('')
   const [fullText, setFullText] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(Boolean(destinationName))
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const started = useRef(false)
@@ -48,13 +52,13 @@ export default function ItineraryPage() {
       const complete = await streamItinerary(
         destinationName,
         vibe,
-        (_chunk, currentText) => setStreamedText(currentText),
+        () => {},
       )
       setStreamedText(complete)
       setFullText(complete)
     } catch (requestError) {
       console.error(requestError)
-      setError('We could not build this itinerary. Check the NVIDIA API key and try again.')
+      setError(requestError.message || 'We could not build this itinerary. Try again.')
     } finally {
       setLoading(false)
     }
@@ -84,8 +88,13 @@ export default function ItineraryPage() {
     )
   }
 
+  const preparingPage = loading || imageLoading || (Boolean(imageUrl) && !imageLoaded)
+
   return (
     <div className="page page--itinerary">
+      {preparingPage && (
+        <GenerationLoader variant="itinerary" destination={destinationName} />
+      )}
       <AppHeader
         onBack={() => navigate(-1)}
         backLabel="All matches"
@@ -151,7 +160,7 @@ export default function ItineraryPage() {
               </div>
             )}
 
-            {!error && <ItineraryView streamedText={streamedText} loading={loading} />}
+            {!error && <ItineraryView streamedText={streamedText} loading={false} />}
           </section>
 
           <aside className="itinerary-sidebar">
